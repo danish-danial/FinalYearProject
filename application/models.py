@@ -1,18 +1,7 @@
-import flask_whooshalchemy 
-from . import app
+from . import app, db
 from datetime import datetime
 from flask_login import UserMixin
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from whoosh.analysis import StemmingAnalyzer
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_whooshalchemy import StemmingAnalyzer
-
-app.config.update(SQLALCHEMY_DATABASE_URI='postgresql://localhost:5432/patient_record')
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db, compare_type = True)
-
 
 class User(db.Model, UserMixin):
 
