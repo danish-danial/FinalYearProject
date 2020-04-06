@@ -1,0 +1,38 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="card mb-3">
+    <div id="scatter_area"></div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-header">
+                <form action='/data_visualization' id="barChartValue" method="GET">
+                    <div class="form-row">
+                            <div class="col">
+                                <select name="X_value" id="X_value" class="custom-select">
+                                    <option value="age_x">Age</option>
+                                    <option value="sex_x">Gender</option>
+                                </select>
+                            </div>
+                            <span class="mx-2 my-2">to</span>
+                            <div class="col">
+                                <select name="y_value" id="y_value" class="custom-select">
+                                    <option value="sex_x">Gender</option>
+                                    <option value="target">Result</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    <i data-feather="filter"></i>
+                                </button>
+                            </div>
+                    </div>     
+                </form>
+            </div>
+            <img src="data:image/png;base64, {{ plot_url }}" class="card-img-top img-fluid">
+        </div>
+    </div>
+</div>
+{% endblock %}
+

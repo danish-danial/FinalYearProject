@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    {% block styles%}
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <style>
+      table th {
+        text-align: center;
+      }
+
+      .table-health {
+        margin: auto;
+        width: 50% !important;
+      }
+    </style>
+    {% endblock%}
+  </head>
+  <body>
+    <table class="table table-bordered">
+      <thead>
+        <tr class="text-center">
+          <td colspan="2">
+            <img
+              src="{{ url_for('static', filename='svg/logo.svg')}}"
+              alt="Ingenious Cardiovascular Disease Predicting System"
+            />
+          </td>
+        </tr>
+        <tr class="text-center">
+          <td colspan="2"><b>General Information</b></td>
+        </tr>
+        <tr>
+          <td>
+            Position
+          </td>
+          <td>
+            {% if id.access_level == 1 %} Doctor {% else %} Patient {% endif %}
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Fullname</td>
+          <td>{{ id.fullname }}</td>
+        </tr>
+        <tr>
+          <td>Identity Card Number</td>
+          <td>{{ id.ic }}</td>
+        </tr>
+        <tr>
+          <td>Email Address</td>
+          <td>{{ id.email }}</td>
+        </tr>
+        <tr>
+          <td>Phone Number</td>
+          <td>{{ id.phone}}</td>
+        </tr>
+        <tr>
+          <td>Date of Birth</td>
+          <td>{{ id.dob }}</td>
+        </tr>
+        <tr>
+          <td>Age</td>
+          <td>{{ id.age }}</td>
+        </tr>
+        <tr>
+          <td>Gender</td>
+          <td>
+            {% if id.gender == 0 %} Female {% else %} Male {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table table-health table-bordered table-sm text-center">
+      <thead>
+        <tr>
+          <td colspan="12">
+            <b>Health Record</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Chest Pain Type</td>
+          <td>Resting Blood Pressure</td>
+          <td>Serum Cholestrol</td>
+          <td>Fasting Blood Sugar</td>
+          <td>Resting ECG</td>
+          <td>Max Heart Rate Achieved</td>
+          <td>Exercise Induced Angina</td>
+          <td>ST Depression Induced by Exercise Relative to Rest</td>
+          <td>Peak Exercise ST Segment</td>
+          <td>Number of Major Vessels Colored by Flourosopy</td>
+          <td>Thal</td>
+          <td>Result</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for health in id.previous_record %}
+        <tr style="background-color: red;">
+          <td colspan="12" style="background-color: red;">{{ health.date_created.strftime('%d/%m/%Y') }}</td>
+        </tr>
+        <tr>
+          <td>
+            {% if health.cp == 1 %} Typical Angina {% elif health.cp == 2 %}
+            Atypical Angina {% elif health.cp == 3 %} Non-anginal Pain {% elif
+            health.cp == 4 %} Asymptotic {% endif %}
+          </td>
+          <td>{{ health.trestbps }}</td>
+          <td>{{ health.chol }}</td>
+          <td>
+            {% if health.fbs == 0 %} Below 120 mg/dl {% elif health.fbs == 1%}
+            Above 120 mg/dl {% endif %}
+          </td>
+          <td>
+            {% if health.restecg == 0%} Normal {% elif health.restecg == 1 %}
+            Having ST Wave Abnormality {% elif health.restecg == 2 %} Left
+            Ventricular Hyperthrophy {% endif %}
+          </td>
+          <td>{{ health.thalach }}</td>
+          <td>
+            {% if health.exang == 0 %} No {% else %} Yes {% endif %}
+          </td>
+          <td>{{ health.oldpeak }}</td>
+          <td>
+            {% if health.slope == 1 %} Upsloping {% elif health.slope == 2 %}
+            Flat {% elif health.slope == 3 %} Downsloping {% endif %}
+          </td>
+          <td>{{ health.ca }}</td>
+          <td>
+            {% if health.thal == 3.0 %} Normal {% elif health.thal == 6.0 %}
+            Fixed Defect {% elif health.thal == 7.0 %} Reversible Defect {%
+            endif %}
+          </td>
+          <td>
+            {% if health.target == 0%} Negative {% else %} Positive {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

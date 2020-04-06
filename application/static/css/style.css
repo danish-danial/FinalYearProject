@@ -1,0 +1,105 @@
+.combodate {
+  display: block;
+}
+
+.combodate .form-control {
+  display: inline-block;
+}
+
+.login,
+.hero {
+  min-height: 100vh;
+}
+
+.hero {
+  background-image: url("/static/img/background.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px dashed #000;
+}
+
+.separator::before {
+  margin-right: 0.25em;
+}
+
+.separator::after {
+  margin-left: 0.25em;
+}
+
+@media only screen and (max-width: 1000px) {
+  .hero {
+    display: none;
+  }
+}
+
+/* Dashboard */
+body {
+  overflow-x: hidden;
+}
+
+.nav.nav-pills.card-header-pills {
+  display: flex;
+  justify-content: center;
+}
+
+#sidebar-wrapper {
+  min-height: 100vh;
+  margin-left: -15rem;
+  -webkit-transition: margin .25s ease-out;
+  -moz-transition: margin .25s ease-out;
+  -o-transition: margin .25s ease-out;
+  transition: margin .25s ease-out;
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 100%;
+}
+
+#sidebar-wrapper .list-group .list-group-item {
+  margin-bottom: 10px;
+}
+
+#sidebar-wrapper .list-group-flush .list-group-item {
+  border: none;
+}
+
+#page-content-wrapper {
+  background-color: #F5F6F8;
+  min-width: 100vw;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -15rem;
+  }
+}

@@ -1,0 +1,257 @@
+{% extends 'dashboard/base.html' %}
+<style>
+  table th {
+    text-align: center;
+  }
+
+  .table {
+    margin: auto;
+    width: 50% !important;
+  }
+</style>
+{% block content %}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-success" role="alert">
+  <i data-feather="check" class="mr-3"></i>{{ message }}
+</div>
+{% endfor %}
+<div class="card">
+  <div class="card-header" style="background-color: #FFF;padding: 1.3rem 1.25rem;">
+    <span>Patient's Record</span>
+    <div class="btn-group float-right">
+      <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i data-feather="more-horizontal"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right"">
+        <a class=" dropdown-item" href="/add_patient"><i data-feather="plus" class="mr-3"></i>Add a Patient Record</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="#" data-toggle="modal" data-target='#uploadCSV'><i data-feather="upload"
+            class="mr-3"></i>Upload a CSV File</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover text-center">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Identity Card</th>
+            <th>Phone Number</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Access Level</th>
+            <th>Result</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        {% set count = namespace(value = 1) %}
+        {% for user in users %}
+        <tbody>
+          <tr>
+            <td>
+              {{ count.value }}
+              {% set count.value = count.value + 1 %}
+            </td>
+            <td>{{ user.fullname }}</td>
+            <td>{{ user.ic }}</td>
+            <td>{{ user.phone}}</td>
+            <td>{{ user.age }}</td>
+            <td>
+              {% if user.sex == 0 %}
+              Female
+              {% else %}
+              Male
+              {% endif %}
+            </td>
+            <td>
+              {% if user.access_level  == 0 %}
+              Patient
+              {% else %}
+              Doctor
+              {% endif %}
+            </td>
+            {% for health in user.health %}
+            <td>
+              {% if health.target == 0 %}
+              <span style="color: #00DEA3; font-weight: bold;"><i data-feather="check-circle"
+                  class="mr-2"></i>Negative</span>
+              {% elif health.target == 1 %}
+              <span style="color: #F2217B; font-weight: bold;"><i data-feather="x-circle"
+                  class="mr-2"></i>Positive</span>
+              {% else %}
+              None
+              {% endif %}
+            </td>
+            {% endfor %}
+            <td>
+              <a href="#" class="btn btn-primary" role="button" data-toggle="tooltip" data-placement="bottom"
+                title="Quick View Patient Record"><span data-toggle="modal" data-target='#view{{ user.id }}'><i
+                    data-feather="eye"></i></span></a>
+              <a href="/update_patient_record/{{ user.id }}" class="btn btn-info" role="button" data-toggle="tooltip"
+                data-placement="bottom" title="Detail View Patient Record"><i data-feather="edit-2"></i></a>
+              <a href="/delete_patient/{{ user.id }}" class="btn btn-danger" role="button" data-toggle="tooltip"
+                data-placement="bottom" title="Delete Patient Record"><i data-feather="trash"></i></a>
+            </td>
+          </tr>
+        </tbody>
+        <!-- Modal for Quick View -->
+        <div class="modal fade" id="view{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Quick View</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="fullname">Full Name</label>
+                  <input type="text" name="fullname" id="" class="form-control" value="{{ user.fullname }}" disabled />
+                </div>
+                <div class="form-group">
+                  <label for="ic">Identity Card Number</label>
+                  <input type="number" name="ic" id="" class="form-control" value="{{ user.ic }}" disabled />
+                </div>
+                <div class="form-group">
+                  <label for="email">Email Address</label>
+                  <input type="email" name="email" id="" class="form-control" value="{{ user.email }}" disabled />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input type="number" name="phone" id="" class="form-control" value="{{ user.phone }}" disabled />
+                </div>
+                <div class="form-group">
+                  <label for="dob">Date of Birth</label>
+                  <input type="text" class="form-control" name="dob" value="{{ user.dob }}" disabled />
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="age">Age</label>
+                      <input type="number" name="age" id="" class="form-control" value="{{ user.age }}" disabled />
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="age">Gender</label>
+                        {% if user.sex == 0 %}
+                        <input type="text" name="age" id="" class="form-control" value="Female" disabled />
+                        {% else %}
+                        <input type="text" name="age" id="" class="form-control" value="Male" disabled />
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="access_level">Access Level</label>
+                  {% if user.access_level == 0 %}
+                  <input type="text" name="access_level" id="" class="form-control" value="Patient" disabled />
+                  {% else %}
+                  <input type="text" name="access_level" id="" class="form-control" value="Doctor" disabled />
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal for CSV -->
+<div class="modal fade" id="uploadCSV" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Upload CSV File</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method='post' action='/upload_patient_record' enctype='multipart/form-data'>
+          <div class="form-group">
+            <div class="accordion mb-3" id="csvExample">
+              <div class="card">
+                <div class="card-header" id="headingTwo">
+                  <h5 class="mb-">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                      data-target="#csvExampleChild" aria-expanded="false" aria-controls="csvExampleChild">
+                      <i data-feather="file-text" class="mr-3"></i>CSV File Format
+                    </button>
+                  </h5>
+                </div>
+                <div id="csvExampleChild" class="collapse" aria-labelledby="headingTwo" data-parent="#csvExample">
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-bordered text-center">
+                        <tr>
+                          <td>Fullname</td>
+                          <td>Identity Card Number</td>
+                          <td>Email</td>
+                          <td>Password<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="Auto generate by System"><i data-feather="help-circle"></i></a></td>
+                          <td>Phone Number</td>
+                          <td>Date of Birth</td>
+                          <td>Age</td>
+                          <td>Gender <a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="0 for Female | 1 for Male"><i data-feather="help-circle"></i></a></td>
+                          <td>Access Level<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="All Patient will be defined as Patient"><i data-feather="help-circle"></i></a></td>
+                          <td>Chest-pain Type<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="1:Tipical Angina|2:Atypical Anginal|3:Non-anginal Pain|4:Asymptotic"><i
+                                data-feather="help-circle"></i></a></td>
+                          <td>Resting Blood Pressure<a href="#" role="button" data-toggle="tooltip"
+                              data-placement="bottom" title="mmHg"><i data-feather="help-circle"></i></a></td>
+                          <td>Serum Cholestrol<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="mg/dl"><i data-feather="help-circle"></i></a></td>
+                          <td>Fasting Blood Sugar<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="0 for Below 120mg/dl | 1 for Above 120mg/dl"><i data-feather="help-circle"></i></a>
+                          </td>
+                          <td>Resting ECG<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="0 for Normal | 1 for Having ST-T Wave Abnormality | 2 for Left Ventricular Hyperthrophy"><i
+                                data-feather="help-circle"></i></a></td>
+                          <td>Max Heart Rate Achieve</td>
+                          <td>Exercise Induced Angina<a href="#" role="button" data-toggle="tooltip"
+                              data-placement="bottom" title="0 for No | 1 for Yes"><i
+                                data-feather="help-circle"></i></a>
+                          </td>
+                          <td>ST Depression Induced by Exercise Relative to Rest</td>
+                          <td>Peak Exercise ST Segment<a href="#" role="button" data-toggle="tooltip"
+                              data-placement="bottom" title="1 for Uplsloping | 2 for Flat | 3 for Downsloping"><i
+                                data-feather="help-circle"></i></a></td>
+                          <td>Number of Major Vessels Colored By Flourosopy</td>
+                          <td>Thal<a href="#" role="button" data-toggle="tooltip" data-placement="bottom"
+                              title="3.0 for Normal | 6.0 for Fixed Defect | 7.0 Reversible Deect"><i
+                                data-feather="help-circle"></i></a></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="customFile" name='file'>
+              <label class="custom-file-label" for="customFile">Choose CSV File</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary btn-block"><i data-feather="upload" class="mr-3"></i>Upload
+              File</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

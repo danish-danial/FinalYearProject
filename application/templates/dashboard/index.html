@@ -1,0 +1,66 @@
+{% extends 'dashboard/base.html' %} {% block content %}
+<div class="card text-center my-2">
+  <div class="d-flex bd-highlight">
+    <div class="p-2 flex-fill bd-highlight">
+      <h4>{{ users|length }}</h4>
+      <p>Registered User</p>
+    </div>
+    <div class="p-2 flex-fill bd-highlight">
+      <h4 style="color: #f2217b; font-weight: bold;">{{ positive_result}}</h4>
+      <p>Positive Result</p>
+    </div>
+    <div class="p-2 flex-fill bd-highlight">
+      <h4 style="color: #00dea3; font-weight: bold;">{{ negative_result }}</h4>
+      <p>Negative Result</p>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <span class="btn">Recently Register Patient</span>
+    <div class="float-right">
+        <a href="/patient_record" class="btn btn-primary" role="button" data-toggle="tooltip" data-placement="bottom"
+        title="Detailed Patient Record">
+            <i data-feather='external-link'></i>
+        </a>
+    </div>
+    </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover text-center">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Identity Card</th>
+            <th>Phone Number</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Access Level</th>
+          </tr>
+        </thead>
+        {% for user in users %}
+        <tbody>
+          <tr>
+            <td>
+              {{ loop.index }}
+            </td>
+            <td>{{ user.fullname }}</td>
+            <td>{{ user.ic }}</td>
+            <td>{{ user.phone}}</td>
+            <td>{{ user.age }}</td>
+            <td>
+              {% if user.sex == 0 %} Female {% else %} Male {% endif %}
+            </td>
+            <td>
+              {% if user.access_level == 0 %} Patient {% else %} Doctor {% endif
+              %}
+            </td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

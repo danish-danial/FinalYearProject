@@ -1,0 +1,71 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container-fluid">
+  <div class="row no-gutter">
+    <div class="col-lg-4">
+      <div class="login d-flex align-items-center">
+        <div class="container">
+          <div class="row">
+            <div class="mx-auto">
+              <img src="{{ url_for('static', filename='svg/logo.svg')}}" class="pb-5"
+                alt="Ingenious Cardiovascular Disease Predicting System" />
+              {% if error is defined %}
+              <div class="alert alert-danger" role="alert">
+                <i data-feather="x-circle" class="mr-3"></i>{{ error }}
+              </div>
+              {% endif %}
+              <form method="post" autocomplete="off">
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text"><i data-feather="mail"></i></div>
+                    </div>
+                    <input type="email" name="email" id="" class="form-control" required />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text"><i data-feather="lock"></i></div>
+                    </div>
+                    <input type="password" name="password" id="" class="form-control" required />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <a href="#" class="btn btn-outline-secondary btn-block">Forgot Password</a>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <button type="submit" class="btn btn-primary btn-block">
+                        Log In
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="separator py-3">New User</div>
+                <div class="input-group">
+                  <a href="{{ url_for('register') }}" class="btn btn-primary btn-large btn-block"
+                    role="button">Register</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8 hero"></div>
+  </div>
+</div>
+
+
+{% block scripts %}
+<script>
+  feather.replace()
+</script>
+<script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+{% endblock %}
+{% endblock %}

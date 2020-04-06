@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Heart Disease Prediction</h1>
+
+<form action="{{url_for('predict')}}" method="post">
+  <input type="number" name="age" placeholder="age" />
+  <input type="number" name="sex" placeholder="sex" />
+  <input type="number" name="cp" placeholder="cp" />
+  <input type="number" name="trestbps" placeholder="trestbps" />
+  <input type="number" name="chol" placeholder="chol" />
+  <input type="number" name="fbs" placeholder="fbs" />
+  <input type="number" name="restecg" placeholder="restecg" />
+  <input type="number" name="thalach" placeholder="thalach" />
+  <input type="number" name="exang" placeholder="exang" />
+  <input type="number" step="0.01" name="oldpeak" placeholder="oldpeak" />
+  <input type="number" name="slope" placeholder="slope" />
+  <input type="number" step="0.01" name="ca" placeholder="ca" />
+  <input type="number" step="0.01" name="thal" placeholder="thal" />
+  <button type="submit">Predict</button>
+</form>
+{{ prediction_text }} {% block scripts %}
+<script>
+  $("#dob").combodate({
+    minYear: 1950,
+    maxYear: 2020,
+    customClass: "form-control"
+  });
+</script>
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/combodate.js') }}"></script>
+{% endblock %} {% endblock %}
