@@ -26,6 +26,7 @@ elasticsearch = "*"
 sqlalchemy-searchable = "*"
 flask-weasyprint = "*"
 gunicorn = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.8"
