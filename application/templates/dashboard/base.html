@@ -98,54 +98,55 @@
       </div>
       {% endif %}
     </div>
-    {% endblock %} {% block scripts %}
     <!-- Load JS -->
+    {% block scripts %}
     <script
-      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-      crossorigin="anonymous"
-    ></script>
-    <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/combodate.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
+    src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"
+  ></script>
+  <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/combodate.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
 
-    <!-- Basic Functional Script -->
-    <script>
-      $(function() {
-        $("#menu-toggle").click(function(e) {
-          e.preventDefault();
-          $("#wrapper").toggleClass("toggled");
-        });
-        feather.replace();
-        $("#date").combodate({
-          minYear: 1950,
-          maxYear: 2020,
-          customClass: "form-control"
-        });
-        $('[data-toggle="tooltip"]').tooltip();
-        $(".custom-file-input").on("change", function() {
-          var fileName = $(this)
-            .val()
-            .split("\\")
-            .pop();
-          $(this)
-            .siblings(".custom-file-label")
-            .addClass("selected")
-            .html(fileName);
-        });
+  <!-- Basic Functional Script -->
+  <script>
+    $(function() {
+      $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
       });
-    </script>
+      feather.replace();
+      $("#date").combodate({
+        minYear: 1950,
+        maxYear: 2020,
+        customClass: "form-control"
+      });
+      $('[data-toggle="tooltip"]').tooltip();
+      $(".custom-file-input").on("change", function() {
+        var fileName = $(this)
+          .val()
+          .split("\\")
+          .pop();
+        $(this)
+          .siblings(".custom-file-label")
+          .addClass("selected")
+          .html(fileName);
+      });
+    });
+  </script>
     {% endblock %}
+    {% endblock %} 
   </body>
 </html>

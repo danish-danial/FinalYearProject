@@ -307,12 +307,12 @@ def upload_patient_record():
                 fullname = row[0], 
                 ic = row[1],
                 email = row[2],
-                password = row[3],
-                phone = row[4],
-                dob = row[5],
-                age = row[6],
-                sex = row[7],
-                access_level = row[8]
+                password = '12345',
+                phone = row[3],
+                dob = row[4],
+                age = row[5],
+                sex = row[6],
+                access_level = row[7]
             )
 
             db.session.add(patient_record)
@@ -320,18 +320,18 @@ def upload_patient_record():
 
             patient_health_record = Health(
                 user_id = patient_record.id,
-                cp = row[9],
-                trestbps = row[10],
-                chol = row[11],
-                fbs = row[12],
-                restecg = row[13],
-                thalach = row[14],
-                exang = row[15],
-                oldpeak = row[16],
-                slope = row[17],
-                ca = row[18],
-                thal = row[19],
-                target = row[20]
+                cp = row[8],
+                trestbps = row[9],
+                chol = row[10],
+                fbs = row[11],
+                restecg = row[12],
+                thalach = row[13],
+                exang = row[14],
+                oldpeak = row[15],
+                slope = row[16],
+                ca = row[17],
+                thal = row[18],
+                target = row[19]
             )
             
             db.session.add(patient_health_record)

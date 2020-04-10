@@ -1,1 +1,11 @@
 *.egg-info/
+.indexes/
+.vscode/
+.env
+migrations/
+Procfile
+Pipfile
+Pipefile.lock
+Icon
+runtime.txt
+application/__pycache__

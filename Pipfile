@@ -27,6 +27,9 @@ sqlalchemy-searchable = "*"
 flask-weasyprint = "*"
 gunicorn = "*"
 python-dotenv = "*"
+pydot = "*"
+graphviz = "*"
+pydotplus = "*"
 
 [requires]
 python_version = "3.8"
