@@ -2,8 +2,16 @@ from . import app
 from .classification_model import classification_model
 from .models import db, User, Health, PreviousRecord
 
-from flask import Flask, logging, Markup, jsonify, redirect, render_template, request, session, url_for
+from bokeh.embed import components, file_html
+from bokeh.models import ColumnDataSource
+from bokeh.palettes import Viridis5
+from bokeh.plotting import figure
+from bokeh.resources import CDN
+
+from flask import Flask, flash, logging, Markup, jsonify, redirect, render_template, request, session, url_for
+
 from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
+
 from flask_login import (
     LoginManager,
     login_required,
@@ -11,8 +19,10 @@ from flask_login import (
     current_user,
     login_user,
 )
-from io import TextIOWrapper, BytesIO
+
 from flask_weasyprint import HTML, render_pdf
+
+from io import TextIOWrapper, BytesIO
 
 import base64
 import csv
@@ -67,6 +77,9 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/forgot_password", methods=['GET', 'POST'])
+def forgot_password():
+    pass
 
 @app.route("/logout")
 @login_required
@@ -153,10 +166,11 @@ def add_patient():
             new_patient = Health(user_id = new_user.id)
             db.session.add(new_patient)
             db.session.commit()
-            return render_template("dashboard/add_patient.html", success="Patient Registered Successfully")
         except:
             return "Error"
     
+        flash('Patient Registered Successfully')
+        return redirect(url_for('patient_record'))
     else:
         return render_template("dashboard/add_patient.html")
 
@@ -344,51 +358,54 @@ def upload_patient_record():
 @login_required
 @register_breadcrumb(app, '.chart', 'Data Visualization')
 @app.route('/data_visualization')
-def data_visualization():    
-    #Get the data from Postgresql and convert it to Matrics 
-    user_dataset = pandas.read_sql(db.session.query(User).statement, db.session.bind)
-    health_dataset = pandas.read_sql(db.session.query(Health).statement, db.session.bind)
-    dataset = user_dataset.merge(health_dataset, left_on = 'id', right_on = 'user_id')
-
+def data_visualization():
+    dataset = pandas.read_sql(db.session.query(User).statement, db.session.bind).merge(pandas.read_sql(db.session.query(Health).statement, db.session.bind), left_on = 'id', right_on = 'user_id')
+    
+    # Second Chart
     X = request.args.get('X_value')
-    y = request.args.get('y_value')
 
-    gender = dataset['sex_x'].map({0: 'Female', 1: 'Male'})
-
-    # As using the Matplotlib or Python, it need to change to binary then decode it 
-    img = BytesIO()
-    if X == 'age_x' and y == 'target':
-        bar = seaborn.countplot(x = dataset['age_x'], hue = dataset['target'])
-        bar.legend_.remove()
-        plt.title('Target versus Age')
-        plt.xlabel('Age')
-        plt.ylabel('Count')
-        plt.legend(title = 'Result', loc = 'upper right', labels=['Negative', 'Positive'])
-        plt.show(bar)
-    elif X == 'sex_x' and y == 'target':
-        bar = seaborn.countplot(x = gender, hue = dataset['target'])
-        bar.legend_.remove()
-        plt.title('Result versus Gender')
-        plt.xlabel('Gender')
-        plt.ylabel('Count')
-        plt.legend(title = 'Result', loc = 'upper right', labels=['Negative', 'Positive'])
+    if X == 'age_x':
+        data = pandas.DataFrame({'count': dataset.groupby(['age_x', 'target']).size()}).reset_index() 
+        data['result'] = data['age_x'].map(str) + " : " + data['target'].map({0: 'Negative', 1: 'Positive'})
     else:
-        bar = seaborn.countplot(x = dataset['age_x'], hue = gender)
-        bar.legend_.remove()
-        plt.title('Gender versus Age')
-        plt.xlabel('Age')
-        plt.ylabel('Count')
-        plt.legend(title = 'Gender', loc = 'upper right', labels=['Male', 'Female'])
-        plt.show(bar)
+        data = pandas.DataFrame({'count': dataset.groupby(['sex_x', 'target']).size()}).reset_index() 
+        data['result'] = data['sex_x'].map({0: 'Female', 1: 'Male'}) + " : " + data['target'].map({0: 'Negative', 1: 'Positive'})
 
-    plt.savefig(img, format='png')
-    plt.close()
-    img.seek(0)
+    data['target'] = data['target'].dropna()
+    result = data['result'].tolist()
+    count = data['count'].tolist()
 
-    plot_url = base64.b64encode(img.getvalue()).decode()
+    source = ColumnDataSource(data = dict(result = result, count = count, color = Viridis5))
 
+    TOOLTIPS = [("Count", "@count")]
+    
+    plot = figure(x_range = result, y_range = (0, len(dataset)), toolbar_location = None, tooltips = TOOLTIPS, sizing_mode = 'scale_width')
+    plot.vbar(x = 'result', top = 'count', source = source, width = 0.5, legend_group = 'result', color = 'color')
+    
+    # Third Chart
+    Xs = request.args.get('X_values')
 
-    return render_template('dashboard/chart.html', plot_url = plot_url)
+    if Xs == 'age_x':
+        datas = pandas.DataFrame({'count': dataset.groupby(['age_x', 'chol']).size()}).reset_index() 
+        datas['result'] = datas['age_x'].map(str) + " | " + datas['chol'].map(str)
+    else:
+        datas = pandas.DataFrame({'count': dataset.groupby(['sex_x', 'chol']).size()}).reset_index() 
+        datas['result'] = datas['sex_x'].map({0: 'Female', 1: 'Male'}) + " : " + datas['chol'].map(str)
+
+    results = datas['result'].tolist()
+    counts = datas['count'].tolist()
+
+    sources = ColumnDataSource(data = dict(results = results, counts = counts, color = Viridis5))
+
+    TOOLTIPS2 = [("Count", "@counts")]
+    
+    plots = figure(x_range = results, y_range = (0, len(dataset)), toolbar_location = None, tooltips = TOOLTIPS2, sizing_mode = 'scale_width')
+    plots.vbar(x = 'results', top = 'counts', source = sources, width = 0.5, legend_group = 'results', color = 'color')
+    
+    chart = file_html(plot, CDN)
+    charts = file_html(plots, CDN)
+
+    return render_template('dashboard/chart.html', chart = chart, charts = charts)
 
 @login_required
 @register_breadcrumb(app, '.summary_report', 'Summary Report')

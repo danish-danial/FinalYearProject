@@ -1,71 +1,114 @@
-{% extends 'dashboard/base.html' %}
-{% block content %}
+{% extends 'dashboard/base.html' %} {% block content %}
 <div class="card">
-    <div class="card-header">
-        Add Patient
-    </div>
-    <div class="card-body">
-        <form action="/add_patient" method="post" autocomplete="off">
-            <div class="form-group">
-                <label for="fullname">Full Name</label>
-                <input type="text" name="fullname" id="" class="form-control" required />
+  <div class="card-header">
+    Add Patient
+  </div>
+  <div class="card-body">
+    <form action="/add_patient" method="post" autocomplete="off">
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input
+          type="text"
+          name="fullname"
+          id=""
+          class="form-control"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" name="email" id="" class="form-control" required />
+      </div>
+      <input type="password" name="password" id="" value="0000" hidden />
+      <div class="form-group">
+        <label for="ic">Identity Card Number</label>
+        <input type="text" name="ic" id="" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="text" name="phone" id="" class="form-control" required />
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input
+              type="text"
+              id="date"
+              data-format="DD-MM-YYYY"
+              data-template="D MMM YYYY"
+              name="dob"
+              value="03-03-2020"
+              required
+            />
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input
+              type="number"
+              name="age"
+              id=""
+              class="form-control"
+              required
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <p>Gender</p>
+            <div class="form-check form-check-inline">
+              <input
+                type="radio"
+                name="sex"
+                id="male"
+                class="form-check-input"
+                value="1"
+                required
+              />
+              <label for="male" class="form-check-label">Male</label>
             </div>
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" name="email" id="" class="form-control" required />
+            <div class="form-check form-check-inline">
+              <input
+                type="radio"
+                name="sex"
+                id="female"
+                class="form-check-input"
+                value="0"
+              />
+              <label for="female" class="form-check-label">Female</label>
             </div>
-            <input type="password" name="password" id="" value="0000" hidden />
-            <div class="form-group">
-                <label for="ic">Identity Card Number</label>
-                <input type="text" name="ic" id="" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" name="phone" id="" class="form-control" required />
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <label for="dob">Date of Birth</label>
-                        <input type="text" id="date" data-format="DD-MM-YYYY" data-template="D MMM YYYY" name="dob"
-                            value="03-03-2020" required />
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label for="age">Age</label>
-                        <input type="number" name="age" id="" class="form-control" required />
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <p>Gender</p>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="sex" id="male" class="form-check-input" value="1" required />
-                            <label for="male" class="form-check-label">Male</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input type="radio" name="sex" id="female" class="form-check-input" value="0" />
-                            <label for="female" class="form-check-label">Female</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label for="access_level">Access Level</label>
-                        <input type="number" name="access_level" id="" class="form-control" value="0" hidden>
-                        <input type="text" class="form-control" placeholder="Patient" disabled>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <button type="submit" class="btn btn-primary btn-block">
-                    Add Patient
-                </button>
-            </div>
-        </form>
-    </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            <label for="access_level">Access Level</label>
+            <input
+              type="number"
+              name="access_level"
+              id=""
+              class="form-control"
+              value="0"
+              hidden
+            />
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Patient"
+              disabled
+            />
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary btn-block">
+          Add Patient
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

@@ -10,11 +10,15 @@
   }
 </style>
 {% block content %}
-{% for message in get_flashed_messages() %}
-<div class="alert alert-success" role="alert">
-  <i data-feather="check" class="mr-3"></i>{{ message }}
-</div>
-{% endfor %}
+ {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+              <div class="alert alert-success" role="alert">
+                <i data-feather="check" class="mr-3"></i>{{ message }}
+              </div>
+               {% endfor %}
+         {% endif %}
+  {% endwith %}
 <div class="card">
   <div class="card-header" style="background-color: #FFF;padding: 1.3rem 1.25rem;">
     <span>Patient's Record</span>
