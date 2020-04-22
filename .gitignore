@@ -5,7 +5,7 @@
 migrations/
 Procfile
 Pipfile
-Pipefile.lock
+Pipfile.lock
 Icon
 runtime.txt
 application/__pycache__
