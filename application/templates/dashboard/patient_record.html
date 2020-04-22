@@ -1,4 +1,15 @@
 {% extends 'dashboard/base.html' %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
 <style>
   table th {
     text-align: center;
@@ -10,15 +21,16 @@
   }
 </style>
 {% block content %}
- {% with messages = get_flashed_messages() %}
-         {% if messages %}
-               {% for message in messages %}
-              <div class="alert alert-success" role="alert">
-                <i data-feather="check" class="mr-3"></i>{{ message }}
-              </div>
-               {% endfor %}
-         {% endif %}
-  {% endwith %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-success" role="alert">
+  <i data-feather="check" class="mr-3"></i>{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<input id="myInput" type="text" placeholder="Search..">
 <div class="card">
   <div class="card-header" style="background-color: #FFF;padding: 1.3rem 1.25rem;">
     <span>Patient's Record</span>
@@ -40,6 +52,7 @@
         <thead>
           <tr>
             <th>#</th>
+            <th>Registered Date</th>
             <th>Full Name</th>
             <th>Identity Card</th>
             <th>Phone Number</th>
@@ -50,14 +63,13 @@
             <th>Action</th>
           </tr>
         </thead>
-        {% set count = namespace(value = 1) %}
         {% for user in users %}
-        <tbody>
+        <tbody id="myTable">
           <tr>
             <td>
-              {{ count.value }}
-              {% set count.value = count.value + 1 %}
+                {{ loop.index }}
             </td>
+            <td>{{ user.date_created.strftime('%d/%m/%Y')  }}</td>
             <td>{{ user.fullname }}</td>
             <td>{{ user.ic }}</td>
             <td>{{ user.phone}}</td>

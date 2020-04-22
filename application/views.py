@@ -1,6 +1,6 @@
-from . import app
+from . import app, db
 from .classification_model import classification_model
-from .models import db, User, Health, PreviousRecord
+from .models import User, Health, PreviousRecord
 
 from bokeh.embed import components, file_html
 from bokeh.models import ColumnDataSource
@@ -26,7 +26,6 @@ from io import TextIOWrapper, BytesIO
 
 import base64
 import csv
-import flask_whooshalchemy
 import json
 import io
 import matplotlib.pyplot as plt
@@ -42,11 +41,6 @@ def load_user(id):
     if id is not None:
         return User.query.get(id)
     return None
-
-@app.before_request
-def before_request():
-    if current_user.is_authenticated:
-        flask_whooshalchemy.search_index(app, User)
 
 @app.route("/")
 def home():

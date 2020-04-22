@@ -3,11 +3,13 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[dev-packages]
+
 [packages]
+flask = "*"
 numpy = "*"
 pandas = "*"
 scikit-learn = "*"
-flask = "*"
 matplotlib = "*"
 jupyter = "*"
 seaborn = "*"
@@ -15,25 +17,13 @@ flask-sqlalchemy = "*"
 pylint = "*"
 flask-login = "*"
 flask-breadcrumbs = "*"
-flask-menu = "*"
 six = "*"
 psycopg2 = "*"
 flask-migrate = "*"
-flask-script = "*"
 sqlalchemy = "*"
-flask-whooshalchemy3 = "*"
-elasticsearch = "*"
-sqlalchemy-searchable = "*"
 flask-weasyprint = "*"
-gunicorn = "*"
 python-dotenv = "*"
-pydot = "*"
-graphviz = "*"
-pydotplus = "*"
 bokeh = "*"
 
 [requires]
 python_version = "3.8"
-
-[pipenv]
-allow_prereleases = true
