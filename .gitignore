@@ -3,9 +3,7 @@
 .vscode/
 .env
 migrations/
-Procfile
 Pipfile
 Pipfile.lock
 Icon
-runtime.txt
 application/__pycache__
