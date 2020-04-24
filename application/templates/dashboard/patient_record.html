@@ -1,15 +1,4 @@
 {% extends 'dashboard/base.html' %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script>
-$(document).ready(function(){
-  $("#myInput").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#myTable tr").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-  });
-});
-</script>
 <style>
   table th {
     text-align: center;
@@ -20,6 +9,7 @@ $(document).ready(function(){
     width: 50% !important;
   }
 </style>
+
 {% block content %}
 {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -30,7 +20,12 @@ $(document).ready(function(){
 {% endfor %}
 {% endif %}
 {% endwith %}
-<input id="myInput" type="text" placeholder="Search..">
+<div class="input-group mb-3">
+    <input type="text" name="searchBar" id="searchBar" class="form-control" placeholder="Search Patient Information">
+  <div class="input-group-append">
+    <label class="input-group-text"><i data-feather="search"></i></label>
+  </div>
+</div>
 <div class="card">
   <div class="card-header" style="background-color: #FFF;padding: 1.3rem 1.25rem;">
     <span>Patient's Record</span>
@@ -48,8 +43,8 @@ $(document).ready(function(){
   </div>
   <div class="card-body">
     <div class="table-responsive">
-      <table class="table table-bordered table-hover text-center">
-        <thead>
+      <table id="patientTable" class="table table-bordered text-center tablesorter">
+        <thead class="thead-light">
           <tr>
             <th>#</th>
             <th>Registered Date</th>
@@ -63,8 +58,8 @@ $(document).ready(function(){
             <th>Action</th>
           </tr>
         </thead>
-        {% for user in users %}
-        <tbody id="myTable">
+        <tbody id="patientDetails">
+          {% for user in users %}
           <tr>
             <td>
                 {{ loop.index }}
@@ -107,11 +102,33 @@ $(document).ready(function(){
                     data-feather="eye"></i></span></a>
               <a href="/update_patient_record/{{ user.id }}" class="btn btn-info" role="button" data-toggle="tooltip"
                 data-placement="bottom" title="Detail View Patient Record"><i data-feather="edit-2"></i></a>
-              <a href="/delete_patient/{{ user.id }}" class="btn btn-danger" role="button" data-toggle="tooltip"
-                data-placement="bottom" title="Delete Patient Record"><i data-feather="trash"></i></a>
+              <a href="#" class="btn btn-danger" role="button" data-toggle="tooltip" data-placement="bottom"
+                title="Delete"><span data-toggle="modal" data-target='#deleteConfirmation{{ user.id }}'><i
+                    data-feather="trash"></i></span></a>
             </td>
           </tr>
-        </tbody>
+
+                  <!-- Modal for Delete Confirmation -->
+        <div class="modal fade" id="deleteConfirmation{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmation" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  Delete the selected record ? 
+              </div>
+              <div class="modal-footer">
+                <a href="/delete_patient/{{ user.id }}" class="btn btn-danger" role="button">Delete</a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Modal for Quick View -->
         <div class="modal fade" id="view{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
           aria-hidden="true">
@@ -176,12 +193,12 @@ $(document).ready(function(){
             </div>
           </div>
         </div>
-        {% endfor %}
+          {% endfor %}
+        </tbody>
       </table>
     </div>
   </div>
 </div>
-
 
 <!-- Modal for CSV -->
 <div class="modal fade" id="uploadCSV" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"

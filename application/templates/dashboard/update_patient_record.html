@@ -1,7 +1,10 @@
-{% extends 'dashboard/base.html' %}
-{% block content %}
-{% if result is defined %}
-{% if result == 0 %}
+{% extends 'dashboard/base.html' %} {% block content %} {% with messages =
+get_flashed_messages() %} {% if messages %} {% for message in messages %}
+<div class="alert alert-success" role="alert">
+  <i data-feather="check" class="mr-3"></i>{{ message }}
+</div>
+{% endfor %} {% endif %} {% endwith %} {% if result is defined%} {% if result ==
+0 %}
 <div class="alert alert-success" role="alert">
   <i data-feather="check-circle" class="mr-3"></i>Your Result is <b>Negative</b>
 </div>
@@ -9,51 +12,111 @@
 <div class="alert alert-danger" role="alert">
   <i data-feather="x-circle" class="mr-3"></i>Your Result is <b>Positive</b>
 </div>
-{% endif %}
+{% endif %} {% endif %}
+{% if error is defined %}
+<div class="alert alert-danger" role="alert">
+  <i data-feather="check-x" class="mr-3"></i>{{ error }}</b>
+</div>
 {% endif %}
 <div class="card mb-3">
-  <div class="card-header" style="background-color: #FFF;">
+  <div class="card-header" style="background-color: #fff;">
     <ul class="nav nav-pills card-header-pills" id="myTab" role="tablist">
       <li class="nav-item">
-        <a class="nav-link active" id="general-info-tab" data-toggle="tab" href="#general-info" role="tab"
-          aria-controls="general-info" aria-selected="true">General Information</a>
+        <a
+          class="nav-link active"
+          id="general-info-tab"
+          data-toggle="tab"
+          href="#general-info"
+          role="tab"
+          aria-controls="general-info"
+          aria-selected="true"
+          >General Information</a
+        >
       </li>
       <li class="nav-item">
-        <a class="nav-link" id="health-info-tab" data-toggle="tab" href="#health-info" role="tab"
-          aria-controls="health-info" aria-selected="false">Health Information</a>
+        <a
+          class="nav-link"
+          id="health-info-tab"
+          data-toggle="tab"
+          href="#health-info"
+          role="tab"
+          aria-controls="health-info"
+          aria-selected="false"
+          >Health Information</a
+        >
       </li>
     </ul>
   </div>
   <div class="card-body">
     <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="general-info" role="tabpanel" aria-labelledby="general-info-tab">
-        <form action="/update_patient_record/{{ user.id }}" method="post">
+      <div
+        class="tab-pane fade show active"
+        id="general-info"
+        role="tabpanel"
+        aria-labelledby="general-info-tab"
+      >
+        <form action="/update_patient_record/{{ user.id }}" method="post" autocomplete="off">
           <div class="container">
             <div class="form-group">
               <label for="fullname">Full Name</label>
-              <input type="text" name="fullname" id="" class="form-control" value="{{ user.fullname }}" />
+              <input
+                type="text"
+                name="fullname"
+                id=""
+                class="form-control"
+                value="{{ user.fullname }}"
+              />
             </div>
             <div class="form-group">
               <label for="ic">Identity Card Number</label>
-              <input type="number" name="ic" id="" class="form-control" value="{{ user.ic }}" />
+              <input
+                type="number"
+                name="ic"
+                id=""
+                class="form-control"
+                value="{{ user.ic }}"
+              />
             </div>
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" name="email" id="" class="form-control" value="{{ user.email }}" />
+              <input
+                type="email"
+                name="email"
+                id=""
+                class="form-control"
+                value="{{ user.email }}"
+              />
             </div>
             <div class="form-group">
               <label for="phone">Phone Number</label>
-              <input type="number" name="phone" id="" class="form-control" value="{{ user.phone }}" />
+              <input
+                type="number"
+                name="phone"
+                id=""
+                class="form-control"
+                value="{{ user.phone }}"
+              />
             </div>
             <div class="form-group">
               <label for="dob">Date of Birth</label>
-              <input type="text" class="form-control" name="dob" value="{{ user.dob }}" />
+              <input
+                type="text"
+                class="form-control"
+                name="dob"
+                value="{{ user.dob }}"
+              />
             </div>
             <div class="row">
               <div class="col">
                 <div class="form-group">
                   <label for="age">Age</label>
-                  <input type="number" name="age" id="" class="form-control" value="{{ user.age }}" />
+                  <input
+                    type="number"
+                    name="age"
+                    id=""
+                    class="form-control"
+                    value="{{ user.age }}"
+                  />
                 </div>
               </div>
               <div class="col">
@@ -61,20 +124,46 @@
                   <p>Gender</p>
                   {% if user.sex == 0 %}
                   <div class="form-check form-check-inline">
-                    <input type="radio" name="sex" id="male" class="form-check-input" value="1" />
+                    <input
+                      type="radio"
+                      name="sex"
+                      id="male"
+                      class="form-check-input"
+                      value="1"
+                    />
                     <label for="male" class="form-check-label">Male</label>
                   </div>
                   <div class="form-check form-check-inline">
-                    <input type="radio" name="sex" id="female" class="form-check-input" value="0" checked />
+                    <input
+                      type="radio"
+                      name="sex"
+                      id="female"
+                      class="form-check-input"
+                      value="0"
+                      checked
+                    />
                     <label for="female" class="form-check-label">Female</label>
                   </div>
                   {% else %}
                   <div class="form-check form-check-inline">
-                    <input type="radio" name="sex" id="male" class="form-check-input" value="1" checked />
+                    <input
+                      type="radio"
+                      name="sex"
+                      id="male"
+                      class="form-check-input"
+                      value="1"
+                      checked
+                    />
                     <label for="male" class="form-check-label">Male</label>
                   </div>
                   <div class="form-check form-check-inline">
-                    <input type="radio" name="sex" id="female" class="form-check-input" value="0" />
+                    <input
+                      type="radio"
+                      name="sex"
+                      id="female"
+                      class="form-check-input"
+                      value="0"
+                    />
                     <label for="female" class="form-check-label">Female</label>
                   </div>
                   {% endif %}
@@ -84,9 +173,23 @@
             <div class="form-group">
               <label for="access_level">Access Level</label>
               {% if user.access_level == 0 %}
-              <input type="text" name="access_level" id="" class="form-control" placeholder="Patient" disabled />
+              <input
+                type="text"
+                name="access_level"
+                id=""
+                class="form-control"
+                placeholder="Patient"
+                disabled
+              />
               {% else %}
-              <input type="text" name="access_level" id="" class="form-control" placeholder="Doctor" disabled />
+              <input
+                type="text"
+                name="access_level"
+                id=""
+                class="form-control"
+                placeholder="Doctor"
+                disabled
+              />
               {% endif %}
             </div>
             <div class="py-3">
@@ -97,12 +200,31 @@
           </div>
         </form>
       </div>
-      <div class="tab-pane fade" id="health-info" role="tabpanel" aria-labelledby="health-info-tab">
+      <div
+        class="tab-pane fade"
+        id="health-info"
+        role="tabpanel"
+        aria-labelledby="health-info-tab"
+      >
         {% for health in user.health %}
-        <form action="/predict/{{ user.id }}" method="post">
+        <form action="/predict/{{ user.id }}" method="post" autocomplete="off">
           <div class="container">
-            <input type="number" name="age" id="" class="form-control" value="{{ user.age }}" hidden>
-            <input type="number" name="sex" id="" class="form-control" value="{{ user.sex }}" hidden>
+            <input
+              type="number"
+              name="age"
+              id=""
+              class="form-control"
+              value="{{ user.age }}"
+              hidden
+            />
+            <input
+              type="number"
+              name="sex"
+              id=""
+              class="form-control"
+              value="{{ user.sex }}"
+              hidden
+            />
             <div class="form-group">
               <label for="cp">Chest-pain Type</label>
               <select name="cp" id="" class="form-control">
@@ -136,12 +258,23 @@
             </div>
             <div class="form-group">
               <label for="trestbps">Resting Blood Pressure</label>
-              <input type="number" name="trestbps" class="form-control" placeholder="mmHg"
-                value="{{ health.trestbps }}" />
+              <input
+                type="number"
+                name="trestbps"
+                class="form-control"
+                placeholder="mmHg"
+                value="{{ health.trestbps }}"
+              />
             </div>
             <div class="form-group">
               <label for="chol">Serum Cholestrol</label>
-              <input type="number" name="chol" class="form-control" placeholder="mg/dl" value="{{ health.chol }}" />
+              <input
+                type="number"
+                name="chol"
+                class="form-control"
+                placeholder="mg/dl"
+                value="{{ health.chol }}"
+              />
             </div>
             <div class="form-group">
               <label for="fbs">Fasting Blood Sugar</label>
@@ -172,17 +305,26 @@
                 {% elif health.restecg == 2 %}
                 <option value="0">Normal</option>
                 <option value="1">Having ST-T Wave Abnormality</option>
-                <option value="2" selected>Left Ventricular Hyperthrophy</option>
+                <option value="2" selected
+                  >Left Ventricular Hyperthrophy</option
+                >
                 {% else %}
                 <option value="0">Normal</option>
                 <option value="1">Having ST-T Wave Abnormality</option>
-                <option value="2" selected>Left Ventricular Hyperthrophy</option>
+                <option value="2" selected
+                  >Left Ventricular Hyperthrophy</option
+                >
                 {% endif %}
               </select>
             </div>
             <div class="form-group">
               <label for="thalach">Max Heart Rate Achieved</label>
-              <input type="number" name="thalach" class="form-control" value="{{ health.thalach }}" />
+              <input
+                type="number"
+                name="thalach"
+                class="form-control"
+                value="{{ health.thalach }}"
+              />
             </div>
             <div class="form-group">
               <label for="exang">Exercise Induced Angina</label>
@@ -200,8 +342,16 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="oldpeak">ST Depression Induced by Exercise Relative to Rest</label>
-              <input type="number" step="0.1" name="oldpeak" class="form-control" value="{{ health.oldpeak }}" />
+              <label for="oldpeak"
+                >ST Depression Induced by Exercise Relative to Rest</label
+              >
+              <input
+                type="number"
+                step="0.1"
+                name="oldpeak"
+                class="form-control"
+                value="{{ health.oldpeak }}"
+              />
             </div>
             <div class="form-group">
               <label for="slope">Peak Exercise ST Segment</label>
@@ -226,8 +376,16 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="ca">Number of Major Vessels Colored by Flourosopy</label>
-              <input type="number" step="0.1" name="ca" class="form-control" value="{{ health.ca }}" />
+              <label for="ca"
+                >Number of Major Vessels Colored by Flourosopy</label
+              >
+              <input
+                type="number"
+                step="0.1"
+                name="ca"
+                class="form-control"
+                value="{{ health.ca }}"
+              />
             </div>
             <div class="form-group">
               <label for="thal">Thal</label>

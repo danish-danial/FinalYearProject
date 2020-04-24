@@ -27,8 +27,9 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def __repr__(self):
-        return f"User('{self.fullname}')"
+    @property
+    def serialize(self):
+        return {'fullname': self.fullname}
 
 class Health(db.Model):
 
@@ -50,9 +51,6 @@ class Health(db.Model):
     target = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return "<Health {}>" % (self.target)
-
 class PreviousRecord(db.Model):
 
     __tablename__ = "previous_record"
@@ -72,6 +70,3 @@ class PreviousRecord(db.Model):
     thal = db.Column(db.Float)
     target = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return "<PreviousRecord {}>" % (self.date_created)

@@ -7,12 +7,25 @@
     display: none;
   }
 </style>
+<div class="input-group mb-3">
+  <input
+    type="text"
+    name="searchPatientRecord"
+    id="searchPatientRecord"
+    class="form-control"
+    placeholder="Search Patient Report"
+  />
+  <div class="input-group-append">
+    <label class="input-group-text"><i data-feather="search"></i></label>
+  </div>
+</div>
 {% for user in users %}
 <div id="accordion">
-  <div class="card my-3">
+  <div class="card my-3" data-string="Jamil Hasan">
     <div class="card-header" id="patient">
       <div class="btn">
-        <span class="mr-2">{{ loop.index }}</span><span>{{ user.fullname }}</span>
+        <span class="mr-2">{{ loop.index }}</span
+        ><span>{{ user.fullname }}</span>
       </div>
       <div class="float-right">
         <a
@@ -25,14 +38,17 @@
           <i data-feather="chevron-down" class="chevron-collapse"></i>
           <i data-feather="chevron-up" class="chevron-expand"></i>
         </a>
-        <a href="{{ url_for('print_summary_report', id=user.id) }}" class="btn btn-outline-secondary ml-3">
+        <a
+          href="{{ url_for('print_summary_report', id=user.id) }}"
+          class="btn btn-outline-secondary ml-3"
+        >
           <i data-feather="printer"></i>
         </a>
       </div>
     </div>
     <div
       id="patientDetail-{{ loop.index }}"
-      class="collapse"
+      class="minimize"
       aria-labelledby="patient"
       data-parent="#accordion"
     >
@@ -123,9 +139,14 @@
           </form>
         </li>
         {% for health in user.previous_record %}
-        <span class="badge badge-secondary" style="font-size: 15px; border-radius: 0px; padding: 10px;"><i data-feather="calendar" class="mr-2"></i>{{ health.date_created.strftime('%d/%m/%Y') }}</span>
+        <span
+          class="badge badge-secondary"
+          style="font-size: 15px; border-radius: 0px; padding: 10px;"
+          ><i data-feather="calendar" class="mr-2"></i>{{
+          health.date_created.strftime('%d/%m/%Y') }}</span
+        >
         <li class="list-group-item">
-            <form>
+          <form>
             <div class="container">
               <div class="form-group">
                 <label for="cp">Chest-pain Type</label>
@@ -359,8 +380,8 @@
     </div>
   </div>
 </div>
-{% endfor %} 
+{% endfor %}
 <script>
-    $('.collapse').collapse(); 
+  $(".collapse").collapse();
 </script>
 {% endblock %}

@@ -47,7 +47,15 @@ def home():
     return redirect('/login')
 
 
-# Login | Logout | Register
+# SECTION Forgot Password | Login | Logout | Register
+
+# SECTION Forgot Password
+@app.route("/forgot_password", methods=['GET', 'POST'])
+def forgot_password():
+   pass
+# !SECTION
+
+# SECTION Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -70,18 +78,17 @@ def login():
             return render_template('login.html', error = 'Incorrect Email or Password')
 
     return render_template("login.html")
+# !SECTION
 
-@app.route("/forgot_password", methods=['GET', 'POST'])
-def forgot_password():
-    pass
-
+# SECTION Logout
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect("/login")
+# !SECTION
 
-
+# SECTION Register
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -125,9 +132,23 @@ def register():
 
     else:
         return render_template("register.html")
+# !SECTION
 
+# !SECTION
 
-#  User Section
+@app.route("/dashboard", methods=["GET"])
+@login_required
+@register_breadcrumb(app, '.', 'Home')
+def dashboard():
+    users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created.desc()).limit(5).all()
+    
+    positive_result = Health.query.filter(Health.target == 1).count()
+    negative_result = Health.query.filter(Health.target == 0).count()
+    
+    return render_template("/dashboard/index.html", users=users, positive_result = positive_result, negative_result = negative_result)
+
+# SECTION User Management
+
 @app.route("/add_patient", methods=["POST", "GET"])
 @register_breadcrumb(app, '.patient_record.add_patient', 'Add Patient')
 def add_patient():
@@ -168,17 +189,6 @@ def add_patient():
     else:
         return render_template("dashboard/add_patient.html")
 
-@app.route("/dashboard", methods=["GET"])
-@login_required
-@register_breadcrumb(app, '.', 'Home')
-def dashboard():
-    users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created.desc()).all()
-    
-    positive_result = Health.query.filter(Health.target == 1).count()
-    negative_result = Health.query.filter(Health.target == 0).count()
-    
-    return render_template("/dashboard/index.html", users=users, positive_result = positive_result, negative_result = negative_result)
-
 @app.route("/delete_patient/<int:id>")
 def delete_patient(id):
     user_to_delete = User.query.get_or_404(id)
@@ -190,6 +200,37 @@ def delete_patient(id):
     except:
         return "Error"
 
+@app.route("/patient_record", methods=["POST", "GET"])
+@register_breadcrumb(app, '.patient_record', 'Patient Records')
+def patient_record():
+    users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created).all()
+    return render_template("/dashboard/patient_record.html", users=users)
+
+@app.route('/print/<int:id>/summary_report.pdf', methods=['GET', 'POST'])
+def print_summary_report(id):
+    id = User.query.get_or_404(id)
+    html = render_template('dashboard/print_summary_report.html', id = id)
+    return render_pdf(HTML(string=html))
+
+@login_required
+@register_breadcrumb(app, '.summary_report', 'Summary Report')
+@app.route('/summary_report')
+def summary_report():
+    users = User.query.join(PreviousRecord).filter(PreviousRecord.user_id == User.id ).order_by(User.date_created).all()
+    
+    return render_template('dashboard/summary_report.html', users = users)
+
+@app.route("/users")
+def users():
+    users = User.query.all()
+    return jsonify([user.serialize for user in users])
+
+@app.route('/autocomplete', methods = ['GET'])
+def autocomplete():
+    search = request.args.get('q')
+    query = User.query(User.fullname).filter(User.fullname.like('%' + str(search) + '%'))
+    results = [mv[0] for mv in query.all()]
+    return jsonify(matching_results=results)
 
 @app.route("/update_patient_record/<int:id>", methods=["GET", "POST"])
 @register_breadcrumb(app, '.patient_record.update_patient_record', 'Update Patient Record')
@@ -207,19 +248,63 @@ def update_patient_record(id):
 
         try:
             db.session.commit()
-            return redirect("/patient_record")
         except:
-            return "Error"
+            return render_template('dashboard/update_patient_record.html', error = "Something Wrong. Please Try Again.")
 
+        flash("Successfully Update Patient Information")
+        return redirect(url_for('update_patient_record', id = id))
     else:
         return render_template("dashboard/update_patient_record.html", user=user)
 
+@app.route('/upload_patient_record', methods = ['GET', 'POST'])
+def upload_patient_record():
+    if request.method == 'POST':
+        csv_file = request.files['file']
+        csv_file = TextIOWrapper(csv_file, encoding='utf-8')
+        csv_reader = csv.reader(csv_file, delimiter=',')
+    
+        for row in csv_reader:
+            patient_record = User(
+                fullname = row[0], 
+                ic = row[1],
+                email = row[2],
+                password = '12345',
+                phone = row[3],
+                dob = row[4],
+                age = row[5],
+                sex = row[6],
+                access_level = row[7]
+            )
 
-@app.route("/patient_record", methods=["POST", "GET"])
-@register_breadcrumb(app, '.patient_record', 'Patient Records')
-def patient_record():
-    users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created).all()
-    return render_template("/dashboard/patient_record.html", users=users)
+            db.session.add(patient_record)
+            db.session.flush()
+
+            patient_health_record = Health(
+                user_id = patient_record.id,
+                cp = row[8],
+                trestbps = row[9],
+                chol = row[10],
+                fbs = row[11],
+                restecg = row[12],
+                thalach = row[13],
+                exang = row[14],
+                oldpeak = row[15],
+                slope = row[16],
+                ca = row[17],
+                thal = row[18],
+                target = row[19]
+            )
+            
+            db.session.add(patient_health_record)
+            db.session.commit()
+
+        return redirect('/patient_record')
+
+    return render_template('dashboard/patient_record.html', success_csv = 'File Sucessfully Uploaded')        
+
+# !SECTION
+
+# SECTION Prediction
 
 @app.route("/predict/<int:id>", methods=["GET", "POST"])
 @register_breadcrumb(app, '.patient_record.predict', 'Prediction')
@@ -299,55 +384,9 @@ def results():
     result = prediction[0]
     return jsonify(result)
 
-@app.route("/search_patient")
-def search_patient():
-    pass
+# !SECTION
 
-@app.route('/upload_patient_record', methods = ['GET', 'POST'])
-def upload_patient_record():
-    if request.method == 'POST':
-        csv_file = request.files['file']
-        csv_file = TextIOWrapper(csv_file, encoding='utf-8')
-        csv_reader = csv.reader(csv_file, delimiter=',')
-    
-        for row in csv_reader:
-            patient_record = User(
-                fullname = row[0], 
-                ic = row[1],
-                email = row[2],
-                password = '12345',
-                phone = row[3],
-                dob = row[4],
-                age = row[5],
-                sex = row[6],
-                access_level = row[7]
-            )
-
-            db.session.add(patient_record)
-            db.session.flush()
-
-            patient_health_record = Health(
-                user_id = patient_record.id,
-                cp = row[8],
-                trestbps = row[9],
-                chol = row[10],
-                fbs = row[11],
-                restecg = row[12],
-                thalach = row[13],
-                exang = row[14],
-                oldpeak = row[15],
-                slope = row[16],
-                ca = row[17],
-                thal = row[18],
-                target = row[19]
-            )
-            
-            db.session.add(patient_health_record)
-            db.session.commit()
-
-        return redirect('/patient_record')
-
-    return render_template('dashboard/patient_record.html', success_csv = 'File Sucessfully Uploaded')        
+# SECTION Data Visualization
 
 @login_required
 @register_breadcrumb(app, '.chart', 'Data Visualization')
@@ -401,17 +440,4 @@ def data_visualization():
 
     return render_template('dashboard/chart.html', chart = chart, charts = charts)
 
-@login_required
-@register_breadcrumb(app, '.summary_report', 'Summary Report')
-@app.route('/summary_report')
-def summary_report():
-    users = User.query.join(PreviousRecord).filter(PreviousRecord.user_id == User.id ).order_by(User.date_created).all()
-    
-    return render_template('dashboard/summary_report.html', users = users)
-
-@app.route('/print/<int:id>/summary_report.pdf', methods=['GET', 'POST'])
-def print_summary_report(id):
-    id = User.query.get_or_404(id)
-    html = render_template('dashboard/print_summary_report.html', id = id)
-    return render_pdf(HTML(string=html))
-
+# !SECTION

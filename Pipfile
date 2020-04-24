@@ -24,6 +24,8 @@ sqlalchemy = "*"
 flask-weasyprint = "*"
 python-dotenv = "*"
 bokeh = "*"
+pydotplus = "*"
+mlxtend = "*"
 
 [requires]
 python_version = "3.8"
