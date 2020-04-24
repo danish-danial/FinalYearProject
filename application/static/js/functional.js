@@ -29,8 +29,8 @@ $(function () {
   //  !SECTION File Uploader
 
   //   SECTION Accordian
+  $(".expand").collapse();
   $(".collapse").collapse();
-  $(".minimize").collapse();
   //  !SECTION Accordian
 
   //   !SECTION Boostrap Related

@@ -1,12 +1,6 @@
 <style>
-    .list-group-item.active {
-        background-color: #FFF;
-        color: #05D1CE;
-        font-weight: bolder;
-    }
-
-    .collapse>.list-group-item.list-group-item-action {
-        background-color: #F5F6F8;
+    .expand>.list-group-item.list-group-item-action {
+        color: #808080;
     }
 </style>
 
@@ -21,7 +15,7 @@
                 aria-expanded="false" aria-controls="userOption">
                 <span style="font-weight: bolder;"><i data-feather="user" class="mr-3"></i>{{ current_user.fullname }}
                     <i data-feather="chevron-down" class="ml-3"></i></span></a>
-            <div class="collapse" id="userOption">
+            <div class="expand" id="userOption">
                 <a href="#" class="list-group-item list-group-item-action"><i data-feather="settings" class="mr-3"></i>
                     Setting
                 </a>

@@ -49,14 +49,9 @@ body {
   overflow-x: hidden;
 }
 
-.nav.nav-pills.card-header-pills {
-  display: flex;
-  justify-content: center;
-}
-
 #sidebar-wrapper {
   min-height: 100vh;
-  margin-left: -15rem;
+  margin-left: -16rem;
   -webkit-transition: margin 0.25s ease-out;
   -moz-transition: margin 0.25s ease-out;
   -o-transition: margin 0.25s ease-out;
@@ -69,19 +64,20 @@ body {
 }
 
 #sidebar-wrapper .list-group {
-  width: 100%;
+  width: 15rem;
 }
 
 #sidebar-wrapper .list-group .list-group-item {
-  margin-bottom: 10px;
-}
-
-#sidebar-wrapper .list-group-flush .list-group-item {
   border: none;
 }
 
+#sidebar-wrapper .list-group-item.active{
+  background: none;
+  color: #05D1CE;
+}
+
 #page-content-wrapper {
-  background-color: #f5f6f8;
+  background-color: #F5F6F8;
   min-width: 100vw;
 }
 
@@ -100,6 +96,8 @@ body {
   }
 
   #wrapper.toggled #sidebar-wrapper {
-    margin-left: -15rem;
+    margin-left: -16rem;
   }
 }
+
+.
