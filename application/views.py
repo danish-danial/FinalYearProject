@@ -142,8 +142,8 @@ def register():
 def dashboard():
     users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created.desc()).limit(5).all()
     
-    positive_result = Health.query.filter(Health.target == 1).count()
-    negative_result = Health.query.filter(Health.target == 0).count()
+    positive_result = Health.query.filter(Health.target == 1).filter(Health.user_id >= 0).count()
+    negative_result = Health.query.filter(Health.target == 0).filter(Health.user_id >= 0).count()
     
     return render_template("/dashboard/index.html", users=users, positive_result = positive_result, negative_result = negative_result)
 

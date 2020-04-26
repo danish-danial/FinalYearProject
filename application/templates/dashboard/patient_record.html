@@ -21,10 +21,10 @@
 {% endif %}
 {% endwith %}
 <div class="input-group mb-3">
-    <input type="text" name="searchBar" id="searchBar" class="form-control" placeholder="Search Patient Information">
-  <div class="input-group-append">
-    <label class="input-group-text"><i data-feather="search"></i></label>
+  <div class="input-group-prepend">
+    <button class="btn btn-outline-secondary" type="button" disabled><i data-feather="search"></i></button>
   </div>
+      <input type="text" name="searchBar" id="searchBar" class="form-control" placeholder="Search Patient Information">
 </div>
 <div class="card">
   <div class="card-header" style="background-color: #FFF;padding: 1.3rem 1.25rem;">

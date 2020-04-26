@@ -8,24 +8,26 @@
   }
 </style>
 <div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <button class="btn btn-outline-secondary" type="button" disabled>
+      <i data-feather="search"></i>
+    </button>
+  </div>
   <input
     type="text"
     name="searchPatientRecord"
     id="searchPatientRecord"
     class="form-control"
-    placeholder="Search Patient Report"
+    placeholder="Search Patient Records"
   />
-  <div class="input-group-append">
-    <label class="input-group-text"><i data-feather="search"></i></label>
-  </div>
 </div>
 {% for user in users %}
 <div id="accordion">
-  <div class="card my-3" data-string="Jamil Hasan">
+  <div class="card my-3">
     <div class="card-header" id="patient">
       <div class="btn">
         <span class="mr-2">{{ loop.index }}</span
-        ><span>{{ user.fullname }}</span>
+        ><span class="card-title">{{ user.fullname }}</span>
       </div>
       <div class="float-right">
         <a

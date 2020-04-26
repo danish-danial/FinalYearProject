@@ -6,8 +6,11 @@
         <div class="container">
           <div class="row">
             <div class="mx-auto">
-              <img src="{{ url_for('static', filename='svg/logo.svg')}}" class="pb-5"
-                alt="Ingenious Cardiovascular Disease Predicting System" />
+              <img
+                src="{{ url_for('static', filename='svg/logo.svg')}}"
+                class="img-fluid py-5"
+                alt="Ingenious Cardiovascular Disease Predicting System"
+              />
               {% if error is defined %}
               <div class="alert alert-danger" role="alert">
                 <i data-feather="x-circle" class="mr-3"></i>{{ error }}
@@ -20,44 +23,96 @@
               <form action="/register" method="post" autocomplete="off">
                 <div class="form-group">
                   <label for="fullname">Full Name</label>
-                  <input type="text" name="fullname" id="" class="form-control" required />
+                  <input
+                    type="text"
+                    name="fullname"
+                    id=""
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="form-group">
                   <label for="email">Email Address</label>
-                  <input type="email" name="email" id="" class="form-control" required />
+                  <input
+                    type="email"
+                    name="email"
+                    id=""
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="row">
                   <div class="col">
                     <div class="form-group">
                       <label for="password">Password</label>
-                      <input type="password" name="password" id="" class="form-control" required />
+                      <input
+                        type="password"
+                        name="password"
+                        id=""
+                        class="form-control"
+                        required
+                      />
                     </div>
                   </div>
                   <div class="col">
                     <label for="repassword">Confirm</label>
-                    <input type="password" name="repassword" id="" class="form-control" required />
+                    <input
+                      type="password"
+                      name="repassword"
+                      id=""
+                      class="form-control"
+                      required
+                    />
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="ic">Identity Card Number</label>
-                  <input type="text" name="ic" id="" class="form-control" required />
+                  <input
+                    type="text"
+                    name="ic"
+                    id=""
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="form-group">
                   <label for="phone">Phone Number</label>
-                  <input type="text" name="phone" id="" class="form-control" required />
+                  <input
+                    type="text"
+                    name="phone"
+                    id=""
+                    class="form-control"
+                    required
+                  />
                 </div>
                 <div class="row">
                   <div class="col-7">
                     <div class="form-group">
                       <label for="dob">Date of Birth</label>
-                      <input type="text" id="dob" data-format="DD-MM-YYYY" data-template="D MMM YYYY" name="dob"
-                        value="03-03-2020" required />
+                      <input
+                        type="text"
+                        id="dob"
+                        data-format="DD-MM-YYYY"
+                        data-template="D MMM YYYY"
+                        name="dob"
+                        value="03-03-2020"
+                        required
+                      />
                     </div>
                   </div>
-                  <div class="col" style="padding-left: 0px; margin-left: inherit;">
+                  <div
+                    class="col"
+                    style="padding-left: 0px; margin-left: inherit;"
+                  >
                     <div class="form-group">
                       <label for="age">Age</label>
-                      <input type="number" name="age" id="" class="form-control" required />
+                      <input
+                        type="number"
+                        name="age"
+                        id=""
+                        class="form-control"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
@@ -66,19 +121,39 @@
                     <div class="form-group">
                       <p>Gender</p>
                       <div class="form-check form-check-inline">
-                        <input type="radio" name="sex" id="male" class="form-check-input" value="1" required />
+                        <input
+                          type="radio"
+                          name="sex"
+                          id="male"
+                          class="form-check-input"
+                          value="1"
+                          required
+                        />
                         <label for="male" class="form-check-label">Male</label>
                       </div>
                       <div class="form-check form-check-inline">
-                        <input type="radio" name="sex" id="female" class="form-check-input" value="0" />
-                        <label for="female" class="form-check-label">Female</label>
+                        <input
+                          type="radio"
+                          name="sex"
+                          id="female"
+                          class="form-check-input"
+                          value="0"
+                        />
+                        <label for="female" class="form-check-label"
+                          >Female</label
+                        >
                       </div>
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
                       <label for="access_level">Access Level</label>
-                      <select name="access_level" id="" class="form-control" required>
+                      <select
+                        name="access_level"
+                        id=""
+                        class="form-control"
+                        required
+                      >
                         <option value="0">Patient</option>
                         <option value="1">Doctor</option>
                       </select>
@@ -92,7 +167,11 @@
                     </button>
                   </div>
                   <div class="col">
-                    <a href="{{ url_for('login')}}" class="btn btn-outline-primary btn-block">Cancel</a>
+                    <a
+                      href="{{ url_for('login')}}"
+                      class="btn btn-outline-primary btn-block"
+                      >Cancel</a
+                    >
                   </div>
                 </div>
               </form>
@@ -109,7 +188,7 @@
   $("#dob").combodate({
     minYear: 1950,
     maxYear: 2020,
-    customClass: "form-control"
+    customClass: "form-control",
   });
 </script>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

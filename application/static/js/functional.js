@@ -48,7 +48,7 @@ $(function () {
   });
 
   function search_text(value) {
-    $(".card").each(function () {
+    $("#accordion .card").each(function () {
       var found = "false";
       $(this).each(function () {
         if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
