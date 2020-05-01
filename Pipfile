@@ -27,8 +27,6 @@ bokeh = "*"
 pydotplus = "*"
 mlxtend = "*"
 gunicorn = "*"
-flask-security-too = "*"
-flask-mail = "*"
 
 [requires]
 python_version = "3.8"

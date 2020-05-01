@@ -51,65 +51,6 @@ def home():
 
 # SECTION Forgot Password | Login | Logout | Register
 
-# SECTION Forgot Password
-@app.route("/forgot_password", methods=['GET', 'POST'])
-def forgot_password():
-    if request.method=="POST":
-        mail = request.form['email']
-        check = User.query.filter_by(email = mail).first()
-
-        if check:
-            def get_random_string(length = 24, allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
-                return ''.join(random.choice(allowed_chars) for i in range(length))
-           
-            hashCode = get_random_string()
-            check.hashCode = hashCode
-            db.session.commit()
-            msg = Message('Confirm Password Change', sender = 'berat@github.com', recipients = [mail])
-            msg.body = "Hello,\nWe've received a request to reset your password. If you want to reset your password, click the link below and enter your new password\n http://localhost:5000/" + check.hashCode
-            posta.send(msg)
-            return render_template('forgot_password.html')
-
-    else:
-        return render_template('forgot_password.html')
-
-@app.route("/<string:hashCode>",methods=["GET","POST"])
-def hashcode(hashCode):
-    check = User.query.filter_by(hashCode=hashCode).first()    
-    if check:
-        if request.method == 'POST':
-            passw = request.form['passw']
-            cpassw = request.form['cpassw']
-            if passw == cpassw:
-                check.password = passw
-                check.hashCode= None
-                db.session.commit()
-                return redirect(url_for('home'))
-            else:
-                flash('Password and Confirm Password do not match')
-                return '''
-                    <center>
-                    <form method="post">
-                        <input type="password" name="passw" id="passw" placeholder="Password">
-                        <input type="password" name="cpassw" id="cpassw" placeholder="Confirm Password">
-                        <input type="submit" value="Submit">
-                    </form>
-                    </center>
-                '''
-        else:
-            return '''
-                <center>
-                    <form method="post">
-                        <input type="password" name="passw" id="passw" placeholder="Password">
-                        <input type="password" name="cpassw" id="cpassw" placeholder="Confirm Password">
-                        <input type="submit" value="Submit">
-                    </form>
-                </center>
-            '''
-    else:
-        return redirect('/')
-# !SECTION
-
 # SECTION Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
