@@ -1,4 +1,4 @@
-from . import app, db, posta
+from . import app, db
 from .classification_model import classification_model
 from .models import User, Health, PreviousRecord
 
@@ -19,8 +19,6 @@ from flask_login import (
     current_user,
     login_user,
 )
-
-from flask_mail import Mail, Message
 
 from flask_weasyprint import HTML, render_pdf
 
