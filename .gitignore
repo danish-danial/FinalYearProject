@@ -2,6 +2,7 @@
 .indexes/
 .vscode/
 .env
+migrations/
 Pipfile.lock
 Icon
 application/__pycache__
