@@ -12,6 +12,7 @@ class User(db.Model, UserMixin):
     ic = db.Column(db.String(14))
     email = db.Column(db.String(200), unique = True)
     password = db.Column(db.String(15))
+    hashCode = db.Column(db.String(120))
     phone = db.Column(db.String(15))
     dob = db.Column(db.String(10))
     age = db.Column(db.Integer)

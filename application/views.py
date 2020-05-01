@@ -1,4 +1,4 @@
-from . import app, db
+from . import app, db, posta
 from .classification_model import classification_model
 from .models import User, Health, PreviousRecord
 
@@ -20,6 +20,8 @@ from flask_login import (
     login_user,
 )
 
+from flask_mail import Mail, Message
+
 from flask_weasyprint import HTML, render_pdf
 
 from io import TextIOWrapper, BytesIO
@@ -31,6 +33,7 @@ import io
 import matplotlib.pyplot as plt
 import numpy
 import pandas
+import random
 import seaborn
 
 breadcrumbs = Breadcrumbs(app)
@@ -42,17 +45,69 @@ def load_user(id):
         return User.query.get(id)
     return None
 
-@app.route("/")
+@app.route("/", methods = ["GET", "POST"])
 def home():
-    return redirect('/login')
-
+  return redirect('/login')
 
 # SECTION Forgot Password | Login | Logout | Register
 
 # SECTION Forgot Password
 @app.route("/forgot_password", methods=['GET', 'POST'])
 def forgot_password():
-   pass
+    if request.method=="POST":
+        mail = request.form['email']
+        check = User.query.filter_by(email = mail).first()
+
+        if check:
+            def get_random_string(length = 24, allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+                return ''.join(random.choice(allowed_chars) for i in range(length))
+           
+            hashCode = get_random_string()
+            check.hashCode = hashCode
+            db.session.commit()
+            msg = Message('Confirm Password Change', sender = 'berat@github.com', recipients = [mail])
+            msg.body = "Hello,\nWe've received a request to reset your password. If you want to reset your password, click the link below and enter your new password\n http://localhost:5000/" + check.hashCode
+            posta.send(msg)
+            return render_template('forgot_password.html')
+
+    else:
+        return render_template('forgot_password.html')
+
+@app.route("/<string:hashCode>",methods=["GET","POST"])
+def hashcode(hashCode):
+    check = User.query.filter_by(hashCode=hashCode).first()    
+    if check:
+        if request.method == 'POST':
+            passw = request.form['passw']
+            cpassw = request.form['cpassw']
+            if passw == cpassw:
+                check.password = passw
+                check.hashCode= None
+                db.session.commit()
+                return redirect(url_for('home'))
+            else:
+                flash('Password and Confirm Password do not match')
+                return '''
+                    <center>
+                    <form method="post">
+                        <input type="password" name="passw" id="passw" placeholder="Password">
+                        <input type="password" name="cpassw" id="cpassw" placeholder="Confirm Password">
+                        <input type="submit" value="Submit">
+                    </form>
+                    </center>
+                '''
+        else:
+            return '''
+                <center>
+                    <form method="post">
+                        <input type="password" name="passw" id="passw" placeholder="Password">
+                        <input type="password" name="cpassw" id="cpassw" placeholder="Confirm Password">
+                        <input type="submit" value="Submit">
+                    </form>
+                </center>
+            '''
+    else:
+        return redirect('/')
 # !SECTION
 
 # SECTION Login
@@ -206,19 +261,19 @@ def patient_record():
     users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created).all()
     return render_template("/dashboard/patient_record.html", users=users)
 
-@app.route('/print/<int:id>/summary_report.pdf', methods=['GET', 'POST'])
+@app.route('/print/<int:id>/patient_report.pdf', methods=['GET', 'POST'])
 def print_summary_report(id):
     id = User.query.get_or_404(id)
-    html = render_template('dashboard/print_summary_report.html', id = id)
+    html = render_template('dashboard/print_patient_report.html', id = id)
     return render_pdf(HTML(string=html))
 
 @login_required
-@register_breadcrumb(app, '.summary_report', 'Summary Report')
-@app.route('/summary_report')
-def summary_report():
+@register_breadcrumb(app, '.patients_report', 'Patients Report')
+@app.route('/patients_report')
+def patients_report():
     users = User.query.join(PreviousRecord).filter(PreviousRecord.user_id == User.id ).order_by(User.date_created).all()
     
-    return render_template('dashboard/summary_report.html', users = users)
+    return render_template('dashboard/patients_report.html', users = users)
 
 @app.route("/users")
 def users():
@@ -302,6 +357,30 @@ def upload_patient_record():
 
     return render_template('dashboard/patient_record.html', success_csv = 'File Sucessfully Uploaded')        
 
+@app.route("/setting/<int:id>", methods = ["GET", "POST"])
+@register_breadcrumb(app, '.setting', 'Setting')
+def setting(id):
+    user = User.query.get_or_404(id)
+
+    if request.method == "POST":
+        user.email = request.form["email"]
+        user.phone = request.form["phone"]
+        user.password = request.form["password"]
+        repassword = request.form["confirmpassword"]
+        
+        if repassword == user.password:
+            try:
+                db.session.commit()
+            except:
+                return render_template('dashboard/setting.html', error = "Something Wrong. Please Try Again.")
+            
+            flash("Successfully Update  Information")
+            return redirect(url_for('setting', id = id))
+        else:
+            flash("Password and Confirm Password do not match")
+            return redirect(url_for('setting', id = id))
+    
+    return render_template("dashboard/setting.html", user=user)
 # !SECTION
 
 # SECTION Prediction

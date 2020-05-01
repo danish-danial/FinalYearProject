@@ -1,0 +1,75 @@
+{% extends 'dashboard/base.html' %} {% block content %}
+ {% with messages = get_flashed_messages() %} 
+ {% if messages %} 
+ {% for message in messages %}
+<div class="alert alert-secondary" role="alert">
+  <i data-feather="info" class="mr-3"></i>{{ message }}
+</div>
+{% endfor %} 
+{% endif %} 
+{% endwith %}
+<div class="card mb-3">
+  <div class="card-body">
+    <form
+      action="/setting/{{ user.id }}"
+      method="post"
+      autocomplete="off"
+    >
+      <div class="container">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            id=""
+            class="form-control"
+            value="{{ user.email }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            type="number"
+            name="phone"
+            id=""
+            class="form-control"
+            value="{{ user.phone }}"
+            required
+          />
+        </div>
+        <div class="row">
+            <div class="col">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    id=""
+                    class="form-control"
+                    required
+                />
+            </div>
+        </div>
+            <div class="col">
+                <div class="form-group">
+                <label for="password">Confirm Password</label>
+                <input
+                    type="password"
+                    name="confirmpassword"
+                    id=""
+                    class="form-control"
+                    required
+                />
+            </div>
+        </div>
+    </div>
+      <div class="card-footer" style="background-color: #FFF;">
+          <button type="submit" class="btn btn-primary btn-block">
+            Update
+          </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
