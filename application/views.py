@@ -8,8 +8,6 @@ from bokeh.palettes import Viridis5
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 
-from datetime import datetime
-
 from flask import Flask, flash, logging, Markup, jsonify, redirect, render_template, request, session, url_for
 
 from flask_breadcrumbs import Breadcrumbs, register_breadcrumb
@@ -470,8 +468,6 @@ def predict(id):
             patient_slope = request.form['slope']
             patient_ca = request.form['ca']
             patient_thal = request.form['thal']
-
-            user.date_created = datetime.now()
 
             for health in user.health:
                 health.cp = request.form['cp']
