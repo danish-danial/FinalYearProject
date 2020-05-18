@@ -1,0 +1,247 @@
+{% extends 'dashboard/base.html' %} {% block content %}
+{% with messages =
+get_flashed_messages() %} {% if messages %} {% for message in messages %}
+<div class="alert alert-success" role="alert">
+  <i data-feather="check" class="mr-3"></i>{{ message }}
+</div>
+{% endfor %} {% endif %} {% endwith %}
+{% if error is defined %}
+<div class="alert alert-danger" role="alert">
+  <i data-feather="x-circle" class="mr-3"></i>{{ error }}
+</div>
+{% endif %}
+<div class="card">
+  <div class="card-header">
+    <div class="row h-100">
+      <div class="col-7">
+        <span>{{ user.fullname }}</span><br />
+        <small>{{ user.ic }}</small>
+      </div>
+      <div class="col-5 my-auto">
+        <div class="float-right">
+            <form method="GET">
+              <select class="custom-select" name="date" id="records" onchange="this.form.submit()">
+                <option>Select Date</option>
+                {% for records in user.previous_record %}
+                <option value="{{ records.id }}">{{ records.date_created.strftime('%d/%m/%Y') }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
+      </div>
+    </div>
+  </div>
+  {% if date %}
+{% if current_user.access_level == 1 %}
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover text-center">
+        <thead> 
+          <tr style="background-color: #DEE2E6;">
+            <td colspan="12">
+              {% for health in record %}
+              <i class="mr-3" data-feather="calendar"></i><b>{{ health.date_created.strftime('%d/%m/%Y') }}</b>
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td>Chest Pain Type</td>
+            <td>Resting Blood Pressure</td>
+            <td>Serum Cholestrol</td>
+            <td>Fasting Blood Sugar</td>
+            <td>Resting ECG</td>
+            <td>Max Heart Rate Achieved</td>
+            <td>Exercise Induced Angina</td>
+            <td>ST Depression Induced by Exercise Relative to Rest</td>
+            <td>Peak Exercise ST Segment</td>
+            <td>Number of Major Vessels Colored by Flourosopy</td>
+            <td>Thal</td>
+            <td>Result</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for health in record %}
+          <tr>
+            <td>
+              {% if health.cp == 1 %} Typical Angina {% elif health.cp == 2 %}
+              Atypical Angina {% elif health.cp == 3 %} Non-anginal Pain {%
+                elif health.cp == 4 %} Asymptotic {% endif %}
+            </td>
+            <td>{{ health.trestbps }}</td>
+            <td>{{ health.chol }}</td>
+            <td>
+              {% if health.fbs == 0 %} Below 120 mg/dl {% elif health.fbs ==
+                1%} Above 120 mg/dl {% endif %}
+            </td>
+            <td>
+              {% if health.restecg == 0%} Normal {% elif health.restecg == 1
+                %} Having ST Wave Abnormality {% elif health.restecg == 2 %}
+              Left Ventricular Hyperthrophy {% endif %}
+            </td>
+            <td>{{ health.thalach }}</td>
+            <td>
+              {% if health.exang == 0 %} No {% else %} Yes {% endif %}
+            </td>
+            <td>{{ health.oldpeak }}</td>
+            <td>
+              {% if health.slope == 1 %} Upsloping {% elif health.slope == 2
+                %} Flat {% elif health.slope == 3 %} Downsloping {% endif %}
+            </td>
+            <td>{{ health.ca }}</td>
+            <td>
+              {% if health.thal == 3.0 %} Normal {% elif health.thal == 6.0 %}
+              Fixed Defect {% elif health.thal == 7.0 %} Reversible Defect {%
+                endif %}
+            </td>
+            <td>
+              {% if health.target == 0%} Negative {% else %} Positive {% endif
+                %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <hr />
+    <form action="{{ url_for('patient_feedback', id = user.id, date = date)}}" method="POST">
+      {% for health in record %}
+      <div class="row h-100">
+        <div class="col-8">
+          <div class="form-group">
+            <label for="comment">Comment</label>
+            <textarea class="form-control" id="comment" name="comment" rows="2"
+              placeholder="Feedback from doctor">{{ health.comment }}</textarea>
+          </div>
+        </div>
+        <div class="col-4 my-auto">
+          <label>Feedback from</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="comment-by">Dr.</span>
+            </div>
+            <input type="text" class="form-control" value="{{ current_user.fullname }}" name="comment_by_doctor"
+              disabled />
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
+  <div class="card-footer">
+    <div class="row">
+      <div class="col">
+        <button type="submit" class="btn btn-primary btn-block">
+      Submit Feedback
+    </button>
+      </div>
+      <div class="col">
+            <a href="{{ url_for('print_patient_feedback', id = user.id, date = date)}}" class="btn btn-outline-primary btn-block"><i class="mr-3" data-feather="printer">Print</i>Print</a>
+      </div>
+    </div>
+  </div>
+  </form>
+{% else %}
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover text-center">
+        <thead> 
+          <tr style="background-color: #DEE2E6;">
+            <td colspan="12">
+              {% for health in record %}
+              <i class="mr-3" data-feather="calendar"></i><b>{{ health.date_created.strftime('%d/%m/%Y') }}</b>
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td>Chest Pain Type</td>
+            <td>Resting Blood Pressure</td>
+            <td>Serum Cholestrol</td>
+            <td>Fasting Blood Sugar</td>
+            <td>Resting ECG</td>
+            <td>Max Heart Rate Achieved</td>
+            <td>Exercise Induced Angina</td>
+            <td>ST Depression Induced by Exercise Relative to Rest</td>
+            <td>Peak Exercise ST Segment</td>
+            <td>Number of Major Vessels Colored by Flourosopy</td>
+            <td>Thal</td>
+            <td>Result</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for health in record %}
+          <tr>
+            <td>
+              {% if health.cp == 1 %} Typical Angina {% elif health.cp == 2 %}
+              Atypical Angina {% elif health.cp == 3 %} Non-anginal Pain {%
+                elif health.cp == 4 %} Asymptotic {% endif %}
+            </td>
+            <td>{{ health.trestbps }}</td>
+            <td>{{ health.chol }}</td>
+            <td>
+              {% if health.fbs == 0 %} Below 120 mg/dl {% elif health.fbs ==
+                1%} Above 120 mg/dl {% endif %}
+            </td>
+            <td>
+              {% if health.restecg == 0%} Normal {% elif health.restecg == 1
+                %} Having ST Wave Abnormality {% elif health.restecg == 2 %}
+              Left Ventricular Hyperthrophy {% endif %}
+            </td>
+            <td>{{ health.thalach }}</td>
+            <td>
+              {% if health.exang == 0 %} No {% else %} Yes {% endif %}
+            </td>
+            <td>{{ health.oldpeak }}</td>
+            <td>
+              {% if health.slope == 1 %} Upsloping {% elif health.slope == 2
+                %} Flat {% elif health.slope == 3 %} Downsloping {% endif %}
+            </td>
+            <td>{{ health.ca }}</td>
+            <td>
+              {% if health.thal == 3.0 %} Normal {% elif health.thal == 6.0 %}
+              Fixed Defect {% elif health.thal == 7.0 %} Reversible Defect {%
+                endif %}
+            </td>
+            <td>
+              {% if health.target == 0%} Negative {% else %} Positive {% endif
+                %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <hr />
+      <div class="row h-100">
+        {% for health in record %}
+        <div class="col-7">
+          <div class="form-group">
+            <label for="comment">Comment</label>
+            <textarea class="form-control" id="comment" name="comment" rows="2" disabled>{{ health.comment }}</textarea>
+          </div>
+        </div>
+        <div class="col-5 my-auto">
+          <label>Feedback from</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="comment-by">Dr.</span>
+            </div>
+            <input type="text" class="form-control" value="{{ health.comment_by }}" name="comment_by_doctor"
+              disabled />
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+  </div>
+  <div class="card-footer">
+    <a href="{{ url_for('print_patient_feedback', id = user.id, date = date)}}" class="btn btn-outline-primary btn-block"><i class="mr-3" data-feather="printer">Print</i>Print</a>
+  </div>
+{% endif %}
+  {% else %}
+  <div class="card-body">
+    <h5 class="text-center">
+      <i class="mr-3" data-feather="info"></i>Please Select Date
+    </h5>
+  </div>
+  {% endif %}
+</div>
+  
+{% endblock %}

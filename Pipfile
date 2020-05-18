@@ -28,6 +28,10 @@ pydotplus = "*"
 mlxtend = "*"
 gunicorn = "*"
 flask-mail = "*"
+beautifulsoup4 = "*"
+requests = "*"
+newspaper3k = "*"
+feedparser = "*"
 
 [requires]
 python_version = "3.8"

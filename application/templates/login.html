@@ -11,35 +11,16 @@
                 class="img-fluid pb-5"
                 alt="Ingenious Cardiovascular Disease Predicting System"
               />
-              {% if error is defined %}
+              {% with messages = get_flashed_messages() %} {% if messages %} {%
+              for message in messages %}
+              <div class="alert alert-info" role="alert">
+                <i data-feather="info" class="mr-3"></i>{{ message }}
+              </div>
+              {% endfor %} {% endif %} {% endwith %} {% if error is defined %}
               <div class="alert alert-danger" role="alert">
                 <i data-feather="x-circle" class="mr-3"></i>{{ error }}
               </div>
               {% endif %}
-              <div
-                class="alert alert-warning alert-dismissible fade show"
-                role="alert"
-              >
-                <div class="row">
-                  <div class="col">
-                    <span
-                      ><i data-feather="mail" class="mr-2"></i
-                      >tedbed@mail.com</span
-                    >
-                  </div>
-                  <div class="col">
-                    <span><i data-feather="lock" class="mr-2"></i>ted@123</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="alert"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
               <form method="post" autocomplete="off">
                 <div class="form-group">
                   <label for="email">Email</label>

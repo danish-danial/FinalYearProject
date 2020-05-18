@@ -3,10 +3,12 @@ from .classification_model import classification_model
 from .models import User, Health, PreviousRecord
 
 from bokeh.embed import components, file_html
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, Legend, LegendItem
 from bokeh.palettes import Viridis5
 from bokeh.plotting import figure
 from bokeh.resources import CDN
+
+from datetime import datetime
 
 from flask import Flask, flash, logging, Markup, jsonify, redirect, render_template, request, session, url_for
 
@@ -28,6 +30,7 @@ from io import TextIOWrapper, BytesIO
 
 import base64
 import csv
+import feedparser
 import json
 import io
 import matplotlib.pyplot as plt
@@ -44,6 +47,11 @@ def load_user(id):
     if id is not None:
         return User.query.get(id)
     return None
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash("Please Log In to Continue")
+    return redirect(url_for('login'))
 
 @app.route("/", methods = ["GET", "POST"])
 def home():
@@ -199,12 +207,16 @@ def dashboard():
     
     positive_result = Health.query.filter(Health.target == 1).filter(Health.user_id >= 0).count()
     negative_result = Health.query.filter(Health.target == 0).filter(Health.user_id >= 0).count()
+
+    NewsFeed = feedparser.parse("https://www.sciencedaily.com/rss/health_medicine/heart_disease.xml")
+    entry = NewsFeed.entries[:]
     
-    return render_template("/dashboard/index.html", users=users, positive_result = positive_result, negative_result = negative_result)
+    return render_template("/dashboard/index.html", users=users, positive_result = positive_result, negative_result = negative_result, entry = entry)
 
 # SECTION User Management
 
 @app.route("/add_patient", methods=["POST", "GET"])
+@login_required
 @register_breadcrumb(app, '.patient_record.add_patient', 'Add Patient')
 def add_patient():
     if request.method == "POST":
@@ -244,7 +256,17 @@ def add_patient():
     else:
         return render_template("dashboard/add_patient.html")
 
+
+@app.route('/autocomplete', methods = ['GET'])
+@login_required
+def autocomplete():
+    search = request.args.get('q')
+    query = User.query(User.fullname).filter(User.fullname.like('%' + str(search) + '%'))
+    results = [mv[0] for mv in query.all()]
+    return jsonify(matching_results=results)
+
 @app.route("/delete_patient/<int:id>")
+@login_required
 def delete_patient(id):
     user_to_delete = User.query.get_or_404(id)
 
@@ -255,39 +277,65 @@ def delete_patient(id):
     except:
         return "Error"
 
+@app.route("/patient_feedback/<int:id>", methods = ["GET", "POST"])
+@register_breadcrumb(app, '.patients_report.patient_feedback', 'Patient Feedback')
+def patient_feedback(id):
+    user = User.query.get_or_404(id)
+    date = request.values.get('date')
+
+    if date:
+        record = PreviousRecord.query.filter(PreviousRecord.id == date).all()
+    else:
+        record = ""
+
+    if request.method == "POST":
+        records = PreviousRecord.query.filter_by(id = date).first()
+        records.comment = request.form['comment']
+        records.comment_by = current_user.fullname
+
+        try:
+            db.session.commit()
+        except:
+            return render_template('dashboard/patient_feedback.html', error = "Something Wrong. Please Try Again.")
+
+        flash("Successfully save your comment.")
+        return redirect(url_for('patient_feedback', id = id))
+    
+
+    return render_template('dashboard/patient_feedback.html', user = user, date = date, record = record)
+
 @app.route("/patient_record", methods=["POST", "GET"])
+@login_required
 @register_breadcrumb(app, '.patient_record', 'Patient Records')
 def patient_record():
     users = User.query.join(Health).filter(User.id == Health.user_id).order_by(User.date_created).all()
-    return render_template("/dashboard/patient_record.html", users=users)
+    return render_template("/dashboard/patients_record.html", users=users)
 
-@app.route('/print/<int:id>/patient_report.pdf', methods=['GET', 'POST'])
-def print_summary_report(id):
-    id = User.query.get_or_404(id)
-    html = render_template('dashboard/print_patient_report.html', id = id)
-    return render_pdf(HTML(string=html))
-
-@login_required
-@register_breadcrumb(app, '.patients_report', 'Patients Report')
 @app.route('/patients_report')
+@login_required
+@register_breadcrumb(app, '.patients_report', 'Patient Reports')
 def patients_report():
     users = User.query.join(PreviousRecord).filter(PreviousRecord.user_id == User.id ).order_by(User.date_created).all()
     
     return render_template('dashboard/patients_report.html', users = users)
 
-@app.route("/users")
-def users():
-    users = User.query.all()
-    return jsonify([user.serialize for user in users])
+@app.route('/print/<int:id>/patient_report.pdf', methods=['GET', 'POST'])
+@login_required
+def print_summary_report(id):
+    id = User.query.get_or_404(id)
+    html = render_template('dashboard/print_patient_report.html', id = id)
+    return render_pdf(HTML(string=html))
 
-@app.route('/autocomplete', methods = ['GET'])
-def autocomplete():
-    search = request.args.get('q')
-    query = User.query(User.fullname).filter(User.fullname.like('%' + str(search) + '%'))
-    results = [mv[0] for mv in query.all()]
-    return jsonify(matching_results=results)
+@app.route("/print_feedback/<int:id>/patient_feedback.pdf", methods=['GET', 'POST'])
+@login_required
+def print_patient_feedback(id):
+    id = User.query.get_or_404(id)
+    record = PreviousRecord.query.filter(PreviousRecord.id == request.values.get('date')).all()
+    html = render_template("dashboard/print_patient_feedback.html", id = id, record = record)
+    return render_pdf(HTML(string=html))
 
 @app.route("/update_patient_record/<int:id>", methods=["GET", "POST"])
+@login_required
 @register_breadcrumb(app, '.patient_record.update_patient_record', 'Update Patient Record')
 def update_patient_record(id):
     user = User.query.get_or_404(id)
@@ -312,7 +360,11 @@ def update_patient_record(id):
         return render_template("dashboard/update_patient_record.html", user=user)
 
 @app.route('/upload_patient_record', methods = ['GET', 'POST'])
+@login_required
 def upload_patient_record():
+    def get_random_string(length = 5, allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+        return ''.join(random.choice(allowed_chars) for i in range(length))
+
     if request.method == 'POST':
         csv_file = request.files['file']
         csv_file = TextIOWrapper(csv_file, encoding='utf-8')
@@ -323,7 +375,7 @@ def upload_patient_record():
                 fullname = row[0], 
                 ic = row[1],
                 email = row[2],
-                password = '12345',
+                password = get_random_string(),
                 phone = row[3],
                 dob = row[4],
                 age = row[5],
@@ -355,7 +407,13 @@ def upload_patient_record():
 
         return redirect('/patient_record')
 
-    return render_template('dashboard/patient_record.html', success_csv = 'File Sucessfully Uploaded')        
+    return render_template('dashboard/patients_record.html', success_csv = 'File Sucessfully Uploaded')        
+
+@app.route("/users")
+@login_required
+def users():
+    users = User.query.all()
+    return jsonify([user.serialize for user in users])
 
 @app.route("/setting/<int:id>", methods = ["GET", "POST"])
 @register_breadcrumb(app, '.setting', 'Setting')
@@ -386,76 +444,88 @@ def setting(id):
 # SECTION Prediction
 
 @app.route("/predict/<int:id>", methods=["GET", "POST"])
+@login_required
 @register_breadcrumb(app, '.patient_record.predict', 'Prediction')
 def predict(id):
     user = User.query.get_or_404(id)
-    
-    if request.method == 'POST':
 
-        number_feature = [(n) for n in request.form.values()]
-        feature = [numpy.array(number_feature)]
-        prediction = classification_model.predict(feature)
+    if current_user.access_level == 1:
+        if request.method == 'POST':
 
-        result = prediction[0]
+            number_feature = [(n) for n in request.form.values()]
+            feature = [numpy.array(number_feature)]
+            prediction = classification_model.predict(feature)
 
-        if result == 0:
-            patient_target = 0
+            result = prediction[0]
+
+            patient_id = user.id
+            patient_cp = request.form['cp']
+            patient_trestbps = request.form['trestbps']
+            patient_chol = request.form['chol']
+            patient_fbs = request.form['fbs']
+            patient_restecg = request.form['restecg']
+            patient_thalach = request.form['thalach']
+            patient_exang = request.form['exang']
+            patient_oldpeak = request.form['oldpeak']
+            patient_slope = request.form['slope']
+            patient_ca = request.form['ca']
+            patient_thal = request.form['thal']
+
+            user.date_created = datetime.now()
+
+            for health in user.health:
+                health.cp = request.form['cp']
+                health.trestbps = request.form['trestbps']
+                health.chol = request.form['chol']
+                health.fbs = request.form['fbs']
+                health.restecg = request.form['restecg']
+                health.thalach = request.form['thalach']
+                health.exang = request.form['exang']
+                health.oldpeak = request.form['oldpeak']
+                health.slope = request.form['slope']
+                health.ca = request.form['ca']
+                health.thal = request.form['thal']
+                health.target = int(result)
+            
+            previous_health_record = PreviousRecord(
+                user_id = patient_id,
+                cp = patient_cp,
+                trestbps = patient_trestbps,
+                chol = patient_chol,
+                fbs = patient_fbs,
+                restecg = patient_restecg,
+                thalach = patient_thalach,
+                exang = patient_exang,
+                oldpeak = patient_oldpeak,
+                slope = patient_slope,
+                ca = patient_ca,
+                thal = patient_thal,
+                target = int(result)
+            )
+
+            try:
+                db.session.add(previous_health_record)
+                db.session.commit()
+                return render_template('dashboard/update_patient_record.html', user = user, result = result)
+            except: 
+                return 'Error'
         else:
-            patient_target = 1 
+            return render_template('dashboard/update_patient_record.html', user = user)
 
-        patient_id = user.id
-        patient_cp = request.form['cp']
-        patient_trestbps = request.form['trestbps']
-        patient_chol = request.form['chol']
-        patient_fbs = request.form['fbs']
-        patient_restecg = request.form['restecg']
-        patient_thalach = request.form['thalach']
-        patient_exang = request.form['exang']
-        patient_oldpeak = request.form['oldpeak']
-        patient_slope = request.form['slope']
-        patient_ca = request.form['ca']
-        patient_thal = request.form['thal']
-
-        for health in user.health:
-            health.cp = request.form['cp']
-            health.trestbps = request.form['trestbps']
-            health.chol = request.form['chol']
-            health.fbs = request.form['fbs']
-            health.restecg = request.form['restecg']
-            health.thalach = request.form['thalach']
-            health.exang = request.form['exang']
-            health.oldpeak = request.form['oldpeak']
-            health.slope = request.form['slope']
-            health.ca = request.form['ca']
-            health.thal = request.form['thal']
-            health.target = patient_target
-        
-        previous_health_record = PreviousRecord(
-            user_id = patient_id,
-            cp = patient_cp,
-            trestbps = patient_trestbps,
-            chol = patient_chol,
-            fbs = patient_fbs,
-            restecg = patient_restecg,
-            thalach = patient_thalach,
-            exang = patient_exang,
-            oldpeak = patient_oldpeak,
-            slope = patient_slope,
-            ca = patient_ca,
-            thal = patient_thal,
-            target = patient_target,
-        )
-
-        try:
-            db.session.add(previous_health_record)
-            db.session.commit()
-            return render_template('dashboard/update_patient_record.html', user = user, result = result)
-        except: 
-            return 'Error'
     else:
-        return render_template('dashboard/update_patient_record.html', user = user)
-    
+        if request.method == 'POST':
+
+            number_feature = [(n) for n in request.form.values()]
+            feature = [numpy.array(number_feature)]
+            prediction = classification_model.predict(feature)
+
+            result = prediction[0]
+            return render_template('dashboard/update_patient_record.html', user = user, result = result)
+        else:
+            return render_template('dashboard/update_patient_record.html', user = user)
+
 @app.route("/results", methods=["POST"])
+@login_required
 def results():
     data = request.get_json(force=True)
     prediction = classification_model.predict([numpy.array(list(data.values))])
@@ -467,12 +537,28 @@ def results():
 
 # SECTION Data Visualization
 
+@app.route('/data_visualization')
 @login_required
 @register_breadcrumb(app, '.chart', 'Data Visualization')
-@app.route('/data_visualization')
 def data_visualization():
     dataset = pandas.read_sql(db.session.query(User).statement, db.session.bind).merge(pandas.read_sql(db.session.query(Health).statement, db.session.bind), left_on = 'id', right_on = 'user_id')
+
+# First Chart
+
+    negative = dataset[dataset['target'] == 0].groupby(dataset['date_created_x'].dt.date).size().reset_index(name = 'counts')
+    positive = dataset[dataset['target'] == 1].groupby(dataset['date_created_x'].dt.date).size().reset_index(name = 'counts')
     
+    p = figure(x_axis_type = 'datetime', toolbar_location = None, sizing_mode = 'scale_width')
+    
+    r = p.multi_line(xs = [negative['date_created_x'], positive['date_created_x']], ys = [negative['counts'], positive['counts']], color = ['green', 'red'], line_width = 2)
+    
+    legend = Legend(items = [
+        LegendItem(label="Negative", renderers = [r], index = 0),
+        LegendItem(label="Positive", renderers = [r], index = 1),
+    ])
+    
+    p.add_layout(legend)
+
     # Second Chart
     X = request.args.get('X_value')
 
@@ -514,9 +600,11 @@ def data_visualization():
     plots = figure(x_range = results, y_range = (0, len(dataset)), toolbar_location = None, tooltips = TOOLTIPS2, sizing_mode = 'scale_width')
     plots.vbar(x = 'results', top = 'counts', source = sources, width = 0.5, legend_group = 'results', color = 'color')
     
+    # c = file_html(p, CDN)
+    c = file_html(p, CDN)
     chart = file_html(plot, CDN)
     charts = file_html(plots, CDN)
 
-    return render_template('dashboard/chart.html', chart = chart, charts = charts)
+    return render_template('dashboard/chart.html', c = c, chart = chart, charts = charts)
 
 # !SECTION

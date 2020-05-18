@@ -18,6 +18,7 @@ get_flashed_messages() %} {% if messages %} {% for message in messages %}
   <i data-feather="check-x" class="mr-3"></i>{{ error }}</b>
 </div>
 {% endif %}
+{% if current_user.access_level == 1%}
 <div class="card mb-3">
   <div class="card-header" style="background-color: #fff;">
     <ul class="nav nav-pills card-header-pills justify-content-center" id="myTab" role="tablist">
@@ -421,4 +422,237 @@ get_flashed_messages() %} {% if messages %} {% for message in messages %}
     </div>
   </div>
 </div>
+{% else %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+ <i data-feather="info"></i> <strong class="ml-3">Disclaimer</strong> 
+  <hr>
+  <p>
+    The data provided in this form is use for early prevention of getting a heart disease. This data will not be recorded nor affected report provided by the doctor.
+  </p>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="card mb-3">
+  <div class="card-header" style="background-color: #fff;">
+     <span>Prediction Simulator</span>
+  </div>
+  <div class="card-body">
+         {% for health in user.health %}
+        <form action="/predict/{{ user.id }}" method="post" autocomplete="off">
+          <div class="container">
+            <input
+              type="number"
+              name="age"
+              id=""
+              class="form-control"
+              value="{{ user.age }}"
+              hidden
+            />
+            <input
+              type="number"
+              name="sex"
+              id=""
+              class="form-control"
+              value="{{ user.sex }}"
+              hidden
+            />
+            <div class="form-group">
+              <label for="cp">Chest-pain Type</label>
+              <select name="cp" id="" class="form-control">
+                {% if health.cp == 1 %}
+                <option value="1" selected>Typical Angina</option>
+                <option value="2">Atypical Angina</option>
+                <option value="3">Non-anginal Pain</option>
+                <option value="4">Asymptotic</option>
+                {% elif health.cp == 2 %}
+                <option value="1">Typical Angina</option>
+                <option value="2" selected>Atypical Angina</option>
+                <option value="3">Non-anginal Pain</option>
+                <option value="4">Asymptotic</option>
+                {% elif health.cp == 3 %}
+                <option value="1">Typical Angina</option>
+                <option value="2">Atypical Angina</option>
+                <option value="3" selected>Non-anginal Pain</option>
+                <option value="4">Asymptotic</option>
+                {% elif health.cp == 4 %}
+                <option value="1">Typical Angina</option>
+                <option value="2">Atypical Angina</option>
+                <option value="3">Non-anginal Pain</option>
+                <option value="4" selected>Asymptotic</option>
+                {% else %}
+                <option value="1">Typical Angina</option>
+                <option value="2">Atypical Angina</option>
+                <option value="3">Non-anginal Pain</option>
+                <option value="4">Asymptotic</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="trestbps">Resting Blood Pressure</label>
+              <input
+                type="number"
+                name="trestbps"
+                class="form-control"
+                placeholder="mmHg"
+                value="{{ health.trestbps }}"
+              />
+            </div>
+            <div class="form-group">
+              <label for="chol">Serum Cholestrol</label>
+              <input
+                type="number"
+                name="chol"
+                class="form-control"
+                placeholder="mg/dl"
+                value="{{ health.chol }}"
+              />
+            </div>
+            <div class="form-group">
+              <label for="fbs">Fasting Blood Sugar</label>
+              <select name="fbs" id="" class="form-control">
+                {% if health.fbs == 0 %}
+                <option value="0" selected>Below 120mg/dl</option>
+                <option value="1">Above 120mg/dl</option>
+                {% elif health.fbs == 1%}
+                <option value="0">Below 120mg/dl</option>
+                <option value="1" selected>Above 120mg/dl</option>
+                {% else %}
+                <option value="0">Below 120mg/dl</option>
+                <option value="1">Above 120mg/dl</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="restecg">Resting ECG</label>
+              <select name="restecg" id="" class="form-control">
+                {% if health.restecg == 0%}
+                <option value="0" selected>Normal</option>
+                <option value="1">Having ST-T Wave Abnormality</option>
+                <option value="2">Left Ventricular Hyperthrophy</option>
+                {% elif health.restecg == 1 %}
+                <option value="0">Normal</option>
+                <option value="1" selected>Having ST-T Wave Abnormality</option>
+                <option value="2">Left Ventricular Hyperthrophy</option>
+                {% elif health.restecg == 2 %}
+                <option value="0">Normal</option>
+                <option value="1">Having ST-T Wave Abnormality</option>
+                <option value="2" selected
+                  >Left Ventricular Hyperthrophy</option
+                >
+                {% else %}
+                <option value="0">Normal</option>
+                <option value="1">Having ST-T Wave Abnormality</option>
+                <option value="2" selected
+                  >Left Ventricular Hyperthrophy</option
+                >
+                {% endif %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="thalach">Max Heart Rate Achieved</label>
+              <input
+                type="number"
+                name="thalach"
+                class="form-control"
+                value="{{ health.thalach }}"
+              />
+            </div>
+            <div class="form-group">
+              <label for="exang">Exercise Induced Angina</label>
+              <select name="exang" id="" class="form-control">
+                {% if health.exang == 0 %}
+                <option value="0" selected>No</option>
+                <option value="1">Yes</option>
+                {% elif health.exang == 1%}
+                <option value="0" selected>No</option>
+                <option value="1">Yes</option>
+                {% else %}
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="oldpeak"
+                >ST Depression Induced by Exercise Relative to Rest</label
+              >
+              <input
+                type="number"
+                step="0.1"
+                name="oldpeak"
+                class="form-control"
+                value="{{ health.oldpeak }}"
+              />
+            </div>
+            <div class="form-group">
+              <label for="slope">Peak Exercise ST Segment</label>
+              <select name="slope" id="" class="form-control">
+                {% if health.slope == 1 %}
+                <option value="1">Upsloping</option>
+                <option value="2">Flat</option>
+                <option value="3">Downsloping</option>
+                {% elif health.slope == 2 %}
+                <option value="1">Upsloping</option>
+                <option value="2" selected>Flat</option>
+                <option value="3">Downsloping</option>
+                {% elif health.slope == 3 %}
+                <option value="1">Upsloping</option>
+                <option value="2">Flat</option>
+                <option value="3" selected>Downsloping</option>
+                {% else %}
+                <option value="1">Upsloping</option>
+                <option value="2">Flat</option>
+                <option value="3" selected>Downsloping</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ca"
+                >Number of Major Vessels Colored by Flourosopy</label
+              >
+              <input
+                type="number"
+                step="0.1"
+                name="ca"
+                class="form-control"
+                value="{{ health.ca }}"
+              />
+            </div>
+            <div class="form-group">
+              <label for="thal">Thal</label>
+              <select name="thal" id="" class="form-control">
+                {% if health.thal == 3.0 %}
+                <option value="3.0" selected>Normal</option>
+                <option value="6.0">Fixed Defect</option>
+                <option value="7.0">Reversible Defect</option>
+                {% elif health.thal == 6.0 %}
+                <option value="3.0">Normal</option>
+                <option value="6.0" selected>Fixed Defect</option>
+                <option value="7.0">Reversible Defect</option>
+                {% elif health.thal == 7.0 %}
+                <option value="3.0">Normal</option>
+                <option value="6.0">Fixed Defect</option>
+                <option value="7.0" selected>Reversible Defect</option>
+                {% else %}
+                <option value="3.0">Normal</option>
+                <option value="6.0">Fixed Defect</option>
+                <option value="7.0">Reversible Defect</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="py-3">
+              <button class="btn btn-primary btn-block" type="submit">
+                Predict
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </form>
+  </div>
+</div>
+{% endif %}
+<script>
+$('.alert').alert()
+</script>
 {% endblock %}

@@ -30,15 +30,23 @@
         <a href="{{ url_for('patient_record') }}"
             {% if request.path == '/patient_record' or request.path == '/update_patient_record/' %}
             class="list-group-item list-group-item-action active" {% endif %}
-            class="list-group-item list-group-item-action"><i data-feather="list" class="mr-3"></i> Patient's
+            class="list-group-item list-group-item-action"><i data-feather="list" class="mr-3"></i> Patient
             Records</a>
+        <a href="{{ url_for('patients_report') }}" {% if request.path == '/patients_report' %}
+            class="list-group-item list-group-item-action active" {% endif %}
+            class="list-group-item list-group-item-action"><i data-feather="file-text" class="mr-3"></i>Patient Reports</a>
+        {% else %}
+        <a href="{{ url_for('patient_feedback', id = current_user.id) }}" {% if request.path == url_for('patient_feedback', id = current_user.id) %}
+            class="list-group-item list-group-item-action active" {% endif %}
+            class="list-group-item list-group-item-action"><i data-feather="file-text" class="mr-3"></i>Patient's Report</a>
+          <a href="{{ url_for('predict', id = current_user.id) }}"
+           {% if request.path == url_for('predict', id = current_user.id) %}
+           class="list-group-item list-group-item-action active" {% endif %}
+           class="list-group-item list-group-item-action"><i data-feather="activity" class="mr-3"></i> Prediction Simulator</a>
         {% endif %}
         <a href="{{ url_for('data_visualization') }}" {% if request.path == '/data_visualization' %}
             class="list-group-item list-group-item-action active" {% endif %}
             class="list-group-item list-group-item-action"><i data-feather="bar-chart" class="mr-3"></i> Data
             Visualization</a>
-        <a href="{{ url_for('patients_report') }}" {% if request.path == '/patients_report' %}
-            class="list-group-item list-group-item-action active" {% endif %}
-            class="list-group-item list-group-item-action"><i data-feather="file-text" class="mr-3"></i>Patients Report</a>
     </div>
 </div>

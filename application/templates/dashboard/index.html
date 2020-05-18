@@ -1,30 +1,56 @@
 {% extends 'dashboard/base.html' %} {% block content %}
-<div class="card text-center my-2">
-  <div class="d-flex bd-highlight">
-    <div class="p-2 flex-fill bd-highlight">
-      <h4>{{ users|length }}</h4>
-      <p>Registered User</p>
+<style>
+  .scroll {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+</style>
+<div class="row my-3">
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-body">
+        <h4>{{ users|length }}</h4>
+        <p>Registered User</p>
+      </div>
     </div>
-    <div class="p-2 flex-fill bd-highlight">
-      <h4 style="color: #f2217b; font-weight: bold;">{{ positive_result}}</h4>
-      <p>Positive Result</p>
+  </div>
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-body">
+        <h4 style="color: #f2217b; font-weight: bold;">{{ positive_result}}</h4>
+        <p>Positive Result</p>
+      </div>
     </div>
-    <div class="p-2 flex-fill bd-highlight">
-      <h4 style="color: #00dea3; font-weight: bold;">{{ negative_result }}</h4>
-      <p>Negative Result</p>
+  </div>
+  <div class="col">
+    <div class="card text-center">
+      <div class="card-body">
+        <h4 style="color: #00dea3; font-weight: bold;">
+          {{ negative_result }}
+        </h4>
+        <p>Negative Result</p>
+      </div>
     </div>
   </div>
 </div>
+{% if current_user.access_level == 1 %}
 <div class="card">
   <div class="card-header">
+    <i class="mr=3" data-feather="clock"></i>
     <span class="btn">Recently Register Patient</span>
     <div class="float-right">
-        <a href="/patient_record" class="btn btn-primary" role="button" data-toggle="tooltip" data-placement="bottom"
-        title="Detailed Patient Record">
-            <i data-feather='external-link'></i>
-        </a>
+      <a
+        href="/patient_record"
+        class="btn btn-primary"
+        role="button"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        title="Detailed Patient Record"
+      >
+        <i data-feather="external-link"></i>
+      </a>
     </div>
-    </div>
+  </div>
   <div class="card-body">
     <div class="table-responsive">
       <table class="table table-bordered table-hover text-center">
@@ -61,6 +87,28 @@
         {% endfor %}
       </table>
     </div>
+  </div>
+</div>
+<hr />
+{% endif %}
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="mr-3" data-feather="layout"></i>
+    News Related to Heart Disease
+  </div>
+  <div class="card-body scroll">
+    {% for news in entry%}
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <a href="{{ news.link }}" class="text-capitalize"
+          ><b>{{ news.title }}</b></a
+        >
+        <p class="text-justify">
+          <small>{{ news.description[:300] }} ...</small>
+        </p>
+      </li>
+    </ul>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}

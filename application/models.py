@@ -70,4 +70,6 @@ class PreviousRecord(db.Model):
     ca = db.Column(db.Float)
     thal = db.Column(db.Float)
     target = db.Column(db.Integer)
+    comment = db.Column(db.String(500))
+    comment_by = db.Column(db.String(150))
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
